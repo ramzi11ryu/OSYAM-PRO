@@ -2,226 +2,310 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
+<title>VP Platform - Deposit</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DZ GEMS - صفحة الإيداع</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
 <style>
 body{
   margin:0;
-  min-height:100vh;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  font-family:Tahoma, Arial;
-  background:linear-gradient(135deg,#0f0c29,#302b63,#24243e);
-  color:#0ff;
+  background:#0f1115;
+  font-family:'Cairo',sans-serif;
+  color:#fff;
 }
-.card{
-  width:420px;
-  background:#111;
-  border-radius:25px;
-  padding:20px 15px;
-  box-shadow:0 25px 30px rgba(0,255,255,.35);
-  text-align:center;
+
+/* ===== Header ===== */
+.header{
+  background:#141822;
+  padding:18px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  border-bottom:1px solid #222;
 }
 .logo{
-  width:200px;
-  border-radius:15px;
-  margin-bottom:10px;
+  font-weight:bold;
+  font-size:20px;
+  color:#00e0ff;
 }
-h2{color:#22c55e;margin-bottom:12px}
-.account{
-  background:#222;
-  padding:12px;
-  border-radius:15px;
-  margin-bottom:10px;
-}
-.acc-row{
-  display:flex;
-  gap:6px;
-  margin-top:6px;
-}
-.acc-row input{
-  flex:1;
-  background:#000;
-  border:none;
-  border-radius:12px;
-  padding:10px;
-  font-size:14px;
-  color:#0ff;
-  text-align:center;
-}
-.copy{
-  background:#22c55e;
-  border:none;
-  border-radius:12px;
-  padding:6px 12px;
+.badge{
+  background:#1e2633;
+  padding:8px 15px;
+  border-radius:20px;
   font-size:13px;
-  cursor:pointer;
+  border:1px solid #2b3445;
 }
-input{
-  width:100%;
-  padding:10px;
-  margin-top:6px;
+
+/* ===== Container ===== */
+.container{
+  max-width:450px;
+  margin:25px auto;
+  padding:15px;
+}
+
+/* ===== Card ===== */
+.card{
+  background:#161b25;
+  border:1px solid #242c3a;
+  border-radius:18px;
+  padding:20px;
+  margin-bottom:20px;
+  box-shadow:0 8px 25px rgba(0,0,0,.6);
+}
+
+.card-title{
+  font-weight:bold;
+  margin-bottom:15px;
+  color:#00e0ff;
+}
+
+/* ===== Copy Box ===== */
+.copy-box{
+  background:#1f2633;
+  border:1px solid #2d3748;
+  padding:12px;
+  border-radius:12px;
+  text-align:center;
+  color:#00e0ff;
+  cursor:pointer;
+  transition:.3s;
+}
+.copy-box:hover{
+  border-color:#00e0ff;
+}
+
+/* ===== Inputs ===== */
+.input-group{
+  display:flex;
+  align-items:center;
+  background:#1f2633;
+  border:1px solid #2d3748;
+  border-radius:12px;
+  padding:0 10px;
+  margin-bottom:12px;
+}
+
+.input-group i{
+  color:#00e0ff;
+  margin-left:8px;
+}
+
+.input-group input{
+  flex:1;
+  background:transparent;
   border:none;
-  border-radius:14px;
-  background:#222;
+  padding:12px 5px;
   color:#fff;
   font-size:14px;
 }
+
+/* ===== Button ===== */
 button{
   width:100%;
-  margin-top:12px;
   padding:14px;
   border:none;
-  border-radius:18px;
-  background:#2563eb;
-  color:#fff;
-  font-size:16px;
+  border-radius:25px;
+  background:linear-gradient(45deg,#00e0ff,#0088ff);
+  color:#000;
   font-weight:bold;
   cursor:pointer;
+  transition:.3s;
 }
-.status{
-  margin-top:10px;
-  background:#222;
-  padding:10px;
-  border-radius:15px;
-  line-height:1.7;
-  font-size:14px;
-  color:#ddd;
-  text-align:right;
+button:hover{
+  box-shadow:0 0 15px #00e0ff;
 }
+button:disabled{opacity:.6}
+
+/* ===== History ===== */
 .history{
-  margin-top:10px;
-  background:#000;
-  padding:10px;
-  border-radius:15px;
-  max-height:150px;
-  overflow:auto;
   font-size:13px;
+  line-height:1.7;
 }
-.pending{color:#facc15}
-hr{border:0;border-top:1px solid #0ff3;margin:6px 0}
+.history-item{
+  background:#1f2633;
+  padding:12px;
+  border-radius:12px;
+  margin-bottom:10px;
+  border:1px solid #2d3748;
+}
+hr{
+  border:0;
+  border-top:1px solid #2d3748;
+}
 </style>
 </head>
 <body>
 
-<div class="card">
-  <img class="logo" src="https://i.postimg.cc/Y9LykS1y/images-(3).jpg">
-  <h2>💰 صفحة الإيداع</h2>
-
-  <div class="account">
-    💳 حساب الإيداع الرسمي (IBAN)
-    <div class="acc-row">
-      <input id="mainAcc" value=" 0079 9999 002084015427" readonly>
-      <button class="copy" onclick="copyAcc()">نسخ</button>
-    </div>
-    <div style="margin-top:8px;font-size:13px;color:#aaa;line-height:1.7;text-align:right">
-      🇩🇿 <b>DZ</b> : رمز الدولة (الجزائر)<br>
-      🏦 <b>0079</b> : رمز البنك<br>
-      🔢 باقي الأرقام : رقم الحساب البنكي<br>
-      ⚠️ الحساب مخصّص <b>للإيداع فقط</b>
-    </div>
-  </div>
-
-  <input type="number" id="amount" placeholder="💰 المبلغ">
-  <input type="text" id="ccp" placeholder="🏦 رقم CCP أو المرجع">
-  <input type="email" id="email" placeholder="📧 البريد الإلكتروني">
-  <input type="file" id="image">
-
-  <button id="send">📤 إرسال الإيداع</button>
-
-  <div class="status" id="status">
-    🔐 جميع عمليات الإيداع تُسجَّل تلقائياً في النظام<br>
-    ❌ لا يمكن التحايل أو التلاعب بالإيداع<br>
-    ⏳ كل إيداع يخضع للمراجعة قبل التفعيل<br>
-    ✅ بعد التأكيد يتم تفعيل الرصيد مباشرة
-  </div>
-
-  <div class="history" id="history">لا توجد إيداعات</div>
+<div class="header">
+  <div class="logo"><i class="fa-solid fa-gem"></i> VP PLATFORM</div>
+  <div class="badge">Deposit System</div>
 </div>
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
-import {
-  getFirestore, collection, addDoc, query, where, onSnapshot, serverTimestamp
-} from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
+<div class="container">
 
-// ===== Firebase الجديد =====
+  <!-- Deposit Card -->
+  <div class="card">
+    <div class="card-title">💳 تسجيل الإيداع</div>
+
+    <div id="copyBox" class="copy-box" onclick="copyCCP()">
+      📋 نسخ رقم 00799999002084015427
+    </div>
+
+    <br>
+
+    <form id="depositForm">
+
+      <div class="input-group">
+        <i class="fa-regular fa-user"></i>
+        <input type="text" id="name" placeholder="اسمك الكامل" required>
+      </div>
+
+      <div class="input-group">
+        <i class="fa-regular fa-image"></i>
+        <input type="file" id="photo" accept="image/*" required>
+      </div>
+
+      <div class="input-group">
+        <i class="fa-solid fa-money-bill"></i>
+        <input type="number" id="amount" placeholder="مبلغ الإيداع" required>
+      </div>
+
+      <div class="input-group">
+        <i class="fa-solid fa-phone"></i>
+        <input type="text" id="phone" placeholder="رقم الهاتف" required>
+      </div>
+
+      <div class="input-group">
+        <i class="fa-solid fa-building-columns"></i>
+        <input type="text" id="userCCP" placeholder="رقم حساب CCP" required>
+      </div>
+
+      <button type="submit" id="sendBtn">إرسال الإيداع</button>
+    </form>
+  </div>
+
+  <!-- History -->
+  <div class="card">
+    <div class="card-title">📄 سجل إيداعاتك</div>
+    <div class="history" id="history">لا توجد إيداعات</div>
+  </div>
+
+</div>
+
+<!-- Firebase + Telegram (نفس خدمتك بدون تغيير) -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import {
+  getFirestore, collection, addDoc,
+  query, where, onSnapshot, serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
 const firebaseConfig = {
-  apiKey: "AIzaSyC45bllaBL4zWWdEqq_4OXd8OWxcyyGmMY",
-  authDomain: "algerie-f4651.firebaseapp.com",
-  projectId: "algerie-f4651",
-  storageBucket: "algerie-f4651.firebasestorage.app",
-  messagingSenderId: "425891746446",
-  appId: "1:425891746446:web:f70f2e6e483e4328eeafdf",
-  measurementId: "G-D55G629L2P"
+  apiKey: "AIzaSyBiQ4dHe4sbKDIrsyF8WdpjV3sY4qAxU4E",
+  authDomain: "osim-d1821.firebaseapp.com",
+  projectId: "osim-d1821",
+  storageBucket: "osim-d1821.firebasestorage.app",
+  messagingSenderId: "464951343183",
+  appId: "1:464951343183:web:21c7615a90e4f38385923a"
 };
 
 const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
 const auth = getAuth(app);
+const db = getFirestore(app);
 
-let uid = null;
-const statusBox = document.getElementById("status");
-const historyBox = document.getElementById("history");
+let uid=null;
+const historyBox=document.getElementById("history");
 
-// نسخ IBAN
-window.copyAcc = () => {
-  navigator.clipboard.writeText(mainAcc.value);
-  alert("✅ تم نسخ رقم الحساب (IBAN)");
-};
+signInAnonymously(auth);
 
-// تحقق تسجيل الدخول
-onAuthStateChanged(auth, user => {
-  if(!user){
-    window.location.href = "login.html";
-    return;
-  }
-  uid = user.uid;
-  loadHistory();
+onAuthStateChanged(auth,u=>{
+  if(u){ uid=u.uid; loadHistory(); }
 });
 
-// إرسال الإيداع
-document.getElementById("send").onclick = async () => {
-  if(!amount.value || !ccp.value || !email.value || !image.files[0]){
-    statusBox.innerHTML = "❌ اكمل جميع الحقول";
-    return;
+const form=document.getElementById("depositForm");
+const btn=document.getElementById("sendBtn");
+
+form.onsubmit = async (e)=>{
+  e.preventDefault();
+  btn.disabled=true;
+  btn.innerText="⏳ جاري الإرسال...";
+
+  const name=nameInput.value;
+  const photo=photoInput.files[0];
+  const amount=amountInput.value;
+  const phone=phoneInput.value;
+  const userCCP=userCCPInput.value;
+
+  try{
+    const tg=new FormData();
+    tg.append("chat_id","5722416028");
+    tg.append("caption",
+`👤 ${name}
+💰 ${amount} دج
+📱 ${phone}
+🏦 ${userCCP}`);
+    tg.append("photo",photo);
+
+    await fetch("https://api.telegram.org/bot8561874849:AAEIpNUvli0QHp-c_GfnYf3NwB5k-f7nMiI/sendPhoto",
+    {method:"POST",body:tg});
+
+    await addDoc(collection(db,"deposits"),{
+      uid,name,amount:Number(amount),
+      phone,userCCP,
+      status:"قيد المراجعة",
+      createdAt:serverTimestamp()
+    });
+
+    form.reset();
+    alert("✅ تم إرسال الإيداع بنجاح");
+
+  }catch(err){
+    alert("❌ حدث خطأ");
   }
 
-  statusBox.innerHTML = "⏳ جاري الإرسال...";
-
-  await addDoc(collection(db, "deposits"), {
-    uid,
-    amount: +amount.value,
-    ccp: ccp.value,
-    email: email.value,
-    status: "قيد المراجعة",
-    createdAt: serverTimestamp()
-  });
-
-  statusBox.innerHTML = "✅ تم إرسال الإيداع (قيد المراجعة)";
-  amount.value = ccp.value = email.value = image.value = "";
+  btn.disabled=false;
+  btn.innerText="إرسال الإيداع";
 };
 
-// عرض إيداعات المستخدم فقط
-function loadHistory() {
-  const q = query(collection(db, "deposits"), where("uid", "==", uid));
-  onSnapshot(q, snap => {
-    let html = "";
-    snap.forEach(d => {
-      const x = d.data();
+function loadHistory(){
+  const q=query(collection(db,"deposits"),where("uid","==",uid));
+  onSnapshot(q,snap=>{
+    let html="";
+    snap.forEach(d=>{
+      const x=d.data();
       if(x.createdAt){
-        html += `
+        html+=`
+        <div class="history-item">
           💰 ${x.amount} دج<br>
-          📅 ${x.createdAt.toDate().toLocaleString("ar-DZ")}<br>
-          <span class="pending">${x.status}</span>
-          <hr>
-        `;
+          📱 ${x.phone}<br>
+          🏦 ${x.userCCP}<br>
+          ⏳ ${x.status}<br>
+          📅 ${x.createdAt.toDate().toLocaleString("ar-DZ")}
+        </div>`;
       }
     });
     historyBox.innerHTML = html || "لا توجد إيداعات";
   });
+}
+
+const nameInput=document.getElementById("name");
+const photoInput=document.getElementById("photo");
+const amountInput=document.getElementById("amount");
+const phoneInput=document.getElementById("phone");
+const userCCPInput=document.getElementById("userCCP");
+</script>
+
+<script>
+function copyCCP(){
+  const box=document.getElementById("copyBox");
+  navigator.clipboard.writeText("00799999002084015427");
+  box.innerText="✅ تم النسخ";
+  setTimeout(()=>{
+    box.innerText="📋 نسخ رقم 00799999002084015427";
+  },1500);
 }
 </script>
 
