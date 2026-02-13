@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Osyam VP - سحب الرصيد</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+* {box-sizing:border-box;}
+body{
+  margin:0;
+  font-family:'Arial', sans-serif;
+  background: linear-gradient(135deg,#0f0f0f,#1a1a1a);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  min-height:100vh;
+  color:#fff;
+}
+
+.container{
+  width:380px;
+  padding:25px;
+  border-radius:20px;
+  background:rgba(30,30,30,0.95);
+  box-shadow: 0 0 20px #00ff0033, inset 0 0 10px #00ff0033;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+}
+
+h1{
+  font-size:24px;
+  color:#00ff00;
+  text-shadow:0 0 8px #00ff00;
+  margin-bottom:20px;
+}
+
+.card{
+  width:100%;
+  background:#1c1c1c;
+  border-radius:15px;
+  padding:15px;
+  margin-bottom:15px;
+  box-shadow:0 0 10px #00ff0033;
+}
+
+.balance{
+  font-size:18px;
+  font-weight:bold;
+  margin-bottom:10px;
+  text-align:center;
+  color:#00ff00;
+}
+
+.input-group{
+  display:flex;
+  align-items:center;
+  margin-bottom:12px;
+  background:#111;
+  border-radius:12px;
+  padding:8px 12px;
+}
+
+.input-group i{
+  margin-left:10px;
+  color:#00ff00;
+}
+
+.input-group input{
+  flex:1;
+  background:transparent;
+  border:none;
+  outline:none;
+  color:#00ff00;
+  font-size:16px;
+}
+
+button{
+  width:100%;
+  padding:14px;
+  border:none;
+  border-radius:15px;
+  background:linear-gradient(145deg,#111,#222);
+  color:#00ff00;
+  font-size:18px;
+  font-weight:bold;
+  cursor:pointer;
+  margin-top:10px;
+  transition:0.3s;
+  box-shadow:0 0 10px #00ff0033,0 0 20px #00ff0055 inset;
+}
+button:hover{
+  box-shadow:0 0 15px #00ff0055,0 0 30px #00ff0077 inset;
+}
+
+button:disabled{
+  opacity:.4;
+  cursor:not-allowed;
+  box-shadow:none;
+}
+
+.status{
+  margin-top:12px;
+  min-height:22px;
+  text-align:center;
+  font-weight:bold;
+  color:#ff5555;
+}
+
+.history{
+  max-height:180px;
+  overflow:auto;
+  margin-top:15px;
+  background:#111;
+  border-radius:12px;
+  padding:10px;
+  font-size:14px;
+  color:#00ff00;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h1>💎 Osyam VP - سحب الرصيد</h1>
+
+  <div class="card balance">الرصيد: <span id="balanceBox">0</span> دج</div>
+
+  <div class="card">
+    <div class="input-group">
+      <i class="fas fa-coins"></i>
+      <input type="number" id="amount" placeholder="💰 المبلغ (1000 دج فأكثر)">
+    </div>
+    <div class="input-group">
+      <i class="fas fa-university"></i>
+      <input type="text" id="account" placeholder="🏦 رقم الحساب">
+    </div>
+    <div class="input-group">
+      <i class="fas fa-key"></i>
+      <input type="password" id="pin" placeholder="🔑 كلمة السر">
+    </div>
+    <button id="withdraw">سحب الآن</button>
+    <div class="status" id="status">جاهز</div>
+  </div>
+
+  <div class="card history" id="history">لا توجد عمليات</div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+import { getFirestore, doc, getDoc, updateDoc, collection, addDoc, query, where, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+
+// Firebase الجديد
+const firebaseConfig = {
+  apiKey: "AIzaSyBiQ4dHe4sbKDIrsyF8WdpjV3sY4qAxU4E",
+  authDomain: "osim-d1821.firebaseapp.com",
+  projectId: "osim-d1821",
+  storageBucket: "osim-d1821.firebasestorage.app",
+  messagingSenderId: "464951343183",
+  appId: "1:464951343183:web:21c7615a90e4f38385923a",
+  measurementId: "G-KSVDWLYNV6"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+let uid=null, balance=0, totalDeposit=0;
+
+const balanceBox=document.getElementById("balanceBox");
+const statusBox=document.getElementById("status");
+const historyBox=document.getElementById("history");
+const withdrawBtn=document.getElementById("withdraw");
+
+const amountInput=document.getElementById("amount");
+const accountInput=document.getElementById("account");
+const pinInput=document.getElementById("pin");
+
+onAuthStateChanged(auth, async user=>{
+  if(!user){ window.location.href="login.html"; return; }
+  uid=user.uid;
+  await loadUser();
+  loadHistory();
+  checkWithdrawAvailability();
+});
+
+async function loadUser(){
+  const ref=doc(db,"users",uid);
+  const snap=await getDoc(ref);
+  if(snap.exists()){
+    balance = snap.data().balance || 0;
+    totalDeposit = snap.data().totalDeposit || 0;
+    if(snap.data().account){
+      accountInput.value = snap.data().account;
+      accountInput.disabled = true;
+    }
+  }
+  balanceBox.textContent = balance;
+}
+
+function checkWithdrawAvailability(){
+  if(totalDeposit <=0){
+    withdrawBtn.disabled=true;
+    statusBox.textContent="🔒 السحب متاح بعد الإيداع";
+    return;
+  }
+  withdrawBtn.disabled=false;
+  statusBox.textContent="جاهز";
+}
+
+withdrawBtn.onclick=async()=>{
+  if(withdrawBtn.disabled) return;
+
+  const amount=Number(amountInput.value);
+  const account=accountInput.value.trim();
+  const pin=pinInput.value.trim();
+
+  if(!amount||!account||!pin){ statusBox.textContent="❌ معلومات ناقصة"; return; }
+  if(amount<1000){ statusBox.textContent="❌ الحد الأدنى 1000 دج"; return; }
+  if(amount>balance){ statusBox.textContent="💸 رصيد غير كافي"; return; }
+
+  const userRef = doc(db,"users",uid);
+  const snap = await getDoc(userRef);
+  if(!snap.data().account){
+    await updateDoc(userRef,{account});
+    accountInput.disabled = true;
+  }
+
+  await addDoc(collection(db,"withdraws"),{
+    uid, amount, account, pin,
+    status:"قيد المعالجة",
+    createdAt:serverTimestamp()
+  });
+
+  balance-=amount;
+  await updateDoc(doc(db,"users",uid),{balance});
+  balanceBox.textContent = balance;
+  statusBox.textContent="✅ تم إرسال طلب السحب";
+
+  amountInput.value="";
+  pinInput.value="";
+};
+
+function loadHistory(){
+  const q=query(collection(db,"withdraws"), where("uid","==",uid));
+  onSnapshot(q,snap=>{
+    let html="";
+    snap.forEach(d=>{
+      const x=d.data();
+      if(x.createdAt){
+        html+=`💰 ${x.amount} دج – ${x.status}<br>🕒 ${x.createdAt.toDate().toLocaleString()}<hr>`;
+      }
+    });
+    historyBox.innerHTML = html || "لا توجد عمليات";
+  });
+}
+</script>
+
+</body>
+</html>

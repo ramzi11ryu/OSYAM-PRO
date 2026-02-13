@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>فريقي VP</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+body{
+  margin:0;
+  font-family:'Segoe UI',sans-serif;
+  background:linear-gradient(135deg,#0f0f0f,#1a1a1a,#000);
+  color:#fff;
+}
+.header{
+  padding:20px;
+  text-align:center;
+  font-size:22px;
+  font-weight:bold;
+  background:#000;
+  color:#ffd700;
+}
+.container{ padding:20px; }
+.card{
+  background:rgba(255,255,255,0.05);
+  border-radius:20px;
+  padding:20px;
+  margin-bottom:20px;
+  box-shadow:0 10px 25px rgba(0,0,0,0.6);
+}
+.code-box{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  background:#1c1c1c;
+  padding:10px 15px;
+  border-radius:12px;
+}
+.copy-btn{
+  background:#ffd700;
+  border:none;
+  padding:8px 15px;
+  border-radius:10px;
+  cursor:pointer;
+  font-weight:bold;
+}
+</style>
+</head>
+<body>
+
+<div class="header">👥 فريقي VP</div>
+
+<div class="container">
+
+  <div class="card">
+    <h3>🔑 رمز الدعوة</h3>
+    <div class="code-box">
+      <span id="userCode">---</span>
+      <button onclick="copyCode()" class="copy-btn">نسخ</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>💰 رصيدك</h3>
+    <p id="userBalance">0 دج</p>
+  </div>
+
+  <div class="card">
+    <h3>📊 إحصائيات الفريق</h3>
+    <p>عدد الأعضاء: <span id="teamCount">0</span></p>
+    <button class="copy-btn" onclick="calculateProfit()">حساب الأرباح</button>
+    <div id="profitResult"></div>
+  </div>
+
+</div>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+import { getFirestore, collection, query, where, getDocs, doc, getDoc, updateDoc } 
+from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+import { getAuth, onAuthStateChanged } 
+from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+
+/* 🔥 Firebase Config */
+const firebaseConfig = {
+  apiKey: "AIzaSyBiQ4dHe4sbKDIrsyF8WdpjV3sY4qAxU4E",
+  authDomain: "osim-d1821.firebaseapp.com",
+  projectId: "osim-d1821",
+  storageBucket: "osim-d1821.firebasestorage.app",
+  messagingSenderId: "464951343183",
+  appId: "1:464951343183:web:21c7615a90e4f38385923a"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
+
+let currentUserId = null;
+let teamMembers = [];
+
+const userCode = document.getElementById("userCode");
+const userBalance = document.getElementById("userBalance");
+const teamCount = document.getElementById("teamCount");
+const profitResult = document.getElementById("profitResult");
+
+/* 🔹 توليد رمز عشوائي */
+function generateRefCode(){
+  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  let code = "";
+  for(let i=0;i<8;i++){
+    code += chars.charAt(Math.floor(Math.random()*chars.length));
+  }
+  return code;
+}
+
+/* 🔹 بعد تسجيل الدخول */
+onAuthStateChanged(auth, async (user)=>{
+
+  if(!user){
+    console.log("⚠ لا يوجد مستخدم مسجل");
+    return;
+  }
+
+  currentUserId = user.uid;
+
+  const userRef = doc(db,"users",currentUserId);
+  const userSnap = await getDoc(userRef);
+
+  if(userSnap.exists()){
+    const data = userSnap.data();
+
+    /* توليد رمز إذا ماكانش */
+    if(!data.shortRef){
+      const newCode = generateRefCode();
+      await updateDoc(userRef,{
+        shortRef:newCode,
+        balance:data.balance || 0,
+        lastProfit:data.lastProfit || 0
+      });
+      userCode.textContent = newCode;
+    }else{
+      userCode.textContent = data.shortRef;
+    }
+
+    userBalance.textContent = (data.balance || 0) + " دج";
+  }
+
+  /* 🔹 جلب أعضاء الفريق حسب invite */
+  const myCode = userCode.textContent;
+
+  const q = query(
+    collection(db,"users"),
+    where("invite","==", myCode)  // أي عضو سجل برمزك
+  );
+
+  const snap = await getDocs(q);
+
+  teamMembers = [];
+  snap.forEach(doc=>{
+    teamMembers.push(doc.data());
+  });
+
+  teamCount.textContent = teamMembers.length;
+});
+
+/* نسخ الرمز */
+window.copyCode = function(){
+  navigator.clipboard.writeText(userCode.textContent)
+  .then(()=> alert("✅ تم نسخ الرمز"));
+}
+
+/* حساب الأرباح وزيادتها */
+window.calculateProfit = async function(){
+
+  let total = 0;
+  const count = teamMembers.length;
+
+  /* مكافأة حسب عدد الأعضاء */
+  if(count >= 100) total += 4000;
+  else if(count >= 50) total += 3000;
+  else if(count >= 20) total += 1500;
+
+  /* عمولة حسب المستوى */
+  teamMembers.forEach(member=>{
+    const lvl = member.level || 0;
+    if(lvl === 1) total += 1000;
+    else if(lvl === 2) total += 5000;
+    else if(lvl === 3) total += 10000;
+  });
+
+  const userRef = doc(db,"users",currentUserId);
+  const userSnap = await getDoc(userRef);
+
+  if(userSnap.exists()){
+    const data = userSnap.data();
+    const lastProfit = data.lastProfit || 0;
+
+    if(total > lastProfit){
+      const difference = total - lastProfit;
+      const newBalance = (data.balance || 0) + difference;
+
+      await updateDoc(userRef,{
+        balance:newBalance,
+        lastProfit:total
+      });
+
+      userBalance.textContent = newBalance + " دج";
+      profitResult.innerHTML = `💸 تمت إضافة ${difference} دج`;
+    }else{
+      profitResult.innerHTML = "⚠ لا توجد أرباح جديدة";
+    }
+  }
+}
+
+</script>
+
+</body>
+</html>

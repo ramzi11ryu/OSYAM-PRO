@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DZ GEMS - صفحة الإيداع</title>
+<style>
+body{
+  margin:0;
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  font-family:Tahoma, Arial;
+  background:linear-gradient(135deg,#0f0c29,#302b63,#24243e);
+  color:#0ff;
+}
+.card{
+  width:420px;
+  background:#111;
+  border-radius:25px;
+  padding:20px 15px;
+  box-shadow:0 25px 30px rgba(0,255,255,.35);
+  text-align:center;
+}
+.logo{
+  width:200px;
+  border-radius:15px;
+  margin-bottom:10px;
+}
+h2{color:#22c55e;margin-bottom:12px}
+.account{
+  background:#222;
+  padding:12px;
+  border-radius:15px;
+  margin-bottom:10px;
+}
+.acc-row{
+  display:flex;
+  gap:6px;
+  margin-top:6px;
+}
+.acc-row input{
+  flex:1;
+  background:#000;
+  border:none;
+  border-radius:12px;
+  padding:10px;
+  font-size:14px;
+  color:#0ff;
+  text-align:center;
+}
+.copy{
+  background:#22c55e;
+  border:none;
+  border-radius:12px;
+  padding:6px 12px;
+  font-size:13px;
+  cursor:pointer;
+}
+input{
+  width:100%;
+  padding:10px;
+  margin-top:6px;
+  border:none;
+  border-radius:14px;
+  background:#222;
+  color:#fff;
+  font-size:14px;
+}
+button{
+  width:100%;
+  margin-top:12px;
+  padding:14px;
+  border:none;
+  border-radius:18px;
+  background:#2563eb;
+  color:#fff;
+  font-size:16px;
+  font-weight:bold;
+  cursor:pointer;
+}
+.status{
+  margin-top:10px;
+  background:#222;
+  padding:10px;
+  border-radius:15px;
+  line-height:1.7;
+  font-size:14px;
+  color:#ddd;
+  text-align:right;
+}
+.history{
+  margin-top:10px;
+  background:#000;
+  padding:10px;
+  border-radius:15px;
+  max-height:150px;
+  overflow:auto;
+  font-size:13px;
+}
+.pending{color:#facc15}
+hr{border:0;border-top:1px solid #0ff3;margin:6px 0}
+</style>
+</head>
+<body>
+
+<div class="card">
+  <img class="logo" src="https://i.postimg.cc/Y9LykS1y/images-(3).jpg">
+  <h2>💰 صفحة الإيداع</h2>
+
+  <div class="account">
+    💳 حساب الإيداع الرسمي (IBAN)
+    <div class="acc-row">
+      <input id="mainAcc" value=" 0079 9999 002084015427" readonly>
+      <button class="copy" onclick="copyAcc()">نسخ</button>
+    </div>
+    <div style="margin-top:8px;font-size:13px;color:#aaa;line-height:1.7;text-align:right">
+      🇩🇿 <b>DZ</b> : رمز الدولة (الجزائر)<br>
+      🏦 <b>0079</b> : رمز البنك<br>
+      🔢 باقي الأرقام : رقم الحساب البنكي<br>
+      ⚠️ الحساب مخصّص <b>للإيداع فقط</b>
+    </div>
+  </div>
+
+  <input type="number" id="amount" placeholder="💰 المبلغ">
+  <input type="text" id="ccp" placeholder="🏦 رقم CCP أو المرجع">
+  <input type="email" id="email" placeholder="📧 البريد الإلكتروني">
+  <input type="file" id="image">
+
+  <button id="send">📤 إرسال الإيداع</button>
+
+  <div class="status" id="status">
+    🔐 جميع عمليات الإيداع تُسجَّل تلقائياً في النظام<br>
+    ❌ لا يمكن التحايل أو التلاعب بالإيداع<br>
+    ⏳ كل إيداع يخضع للمراجعة قبل التفعيل<br>
+    ✅ بعد التأكيد يتم تفعيل الرصيد مباشرة
+  </div>
+
+  <div class="history" id="history">لا توجد إيداعات</div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
+import {
+  getFirestore, collection, addDoc, query, where, onSnapshot, serverTimestamp
+} from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
+
+// ===== Firebase الجديد =====
+const firebaseConfig = {
+  apiKey: "AIzaSyC45bllaBL4zWWdEqq_4OXd8OWxcyyGmMY",
+  authDomain: "algerie-f4651.firebaseapp.com",
+  projectId: "algerie-f4651",
+  storageBucket: "algerie-f4651.firebasestorage.app",
+  messagingSenderId: "425891746446",
+  appId: "1:425891746446:web:f70f2e6e483e4328eeafdf",
+  measurementId: "G-D55G629L2P"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
+
+let uid = null;
+const statusBox = document.getElementById("status");
+const historyBox = document.getElementById("history");
+
+// نسخ IBAN
+window.copyAcc = () => {
+  navigator.clipboard.writeText(mainAcc.value);
+  alert("✅ تم نسخ رقم الحساب (IBAN)");
+};
+
+// تحقق تسجيل الدخول
+onAuthStateChanged(auth, user => {
+  if(!user){
+    window.location.href = "login.html";
+    return;
+  }
+  uid = user.uid;
+  loadHistory();
+});
+
+// إرسال الإيداع
+document.getElementById("send").onclick = async () => {
+  if(!amount.value || !ccp.value || !email.value || !image.files[0]){
+    statusBox.innerHTML = "❌ اكمل جميع الحقول";
+    return;
+  }
+
+  statusBox.innerHTML = "⏳ جاري الإرسال...";
+
+  await addDoc(collection(db, "deposits"), {
+    uid,
+    amount: +amount.value,
+    ccp: ccp.value,
+    email: email.value,
+    status: "قيد المراجعة",
+    createdAt: serverTimestamp()
+  });
+
+  statusBox.innerHTML = "✅ تم إرسال الإيداع (قيد المراجعة)";
+  amount.value = ccp.value = email.value = image.value = "";
+};
+
+// عرض إيداعات المستخدم فقط
+function loadHistory() {
+  const q = query(collection(db, "deposits"), where("uid", "==", uid));
+  onSnapshot(q, snap => {
+    let html = "";
+    snap.forEach(d => {
+      const x = d.data();
+      if(x.createdAt){
+        html += `
+          💰 ${x.amount} دج<br>
+          📅 ${x.createdAt.toDate().toLocaleString("ar-DZ")}<br>
+          <span class="pending">${x.status}</span>
+          <hr>
+        `;
+      }
+    });
+    historyBox.innerHTML = html || "لا توجد إيداعات";
+  });
+}
+</script>
+
+</body>
+</html>

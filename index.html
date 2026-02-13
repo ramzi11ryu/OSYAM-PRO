@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Osyam VP</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+body{
+  margin:0;
+  font-family:'Segoe UI',sans-serif;
+  background:linear-gradient(135deg,#0f0f0f,#1a1a1a,#000);
+  color:#fff;
+}
+
+/* ====== HEADER ====== */
+.topbar{
+  padding:25px 20px;
+  text-align:center;
+  background:linear-gradient(135deg,#000,#111,#000);
+  box-shadow:0 5px 30px rgba(0,0,0,0.8);
+}
+
+.logo{
+  font-size:28px;
+  font-weight:900;
+  letter-spacing:2px;
+  text-transform:uppercase;
+  background:linear-gradient(90deg,#ffd700,#ffae00,#ffd700);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+
+.logo span{
+  background:linear-gradient(90deg,#ffffff,#ffd700);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+
+.crown{
+  color:#ffd700;
+  margin-left:8px;
+  animation:glow 2s infinite alternate;
+}
+
+@keyframes glow{
+from{ text-shadow:0 0 5px #ffd700; }
+to{ text-shadow:0 0 20px #ffcc00; }
+}
+
+/* ====== ADS FADE ====== */
+.ads-container{
+  width:95%;
+  height:180px;
+  margin:20px auto;
+  position:relative;
+  overflow:hidden;
+  border-radius:20px;
+  box-shadow:0 10px 30px rgba(0,0,0,0.7);
+}
+
+.ads-container img{
+  position:absolute;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  opacity:0;
+  transition:opacity 0.7s ease-in-out;
+}
+
+.ads-container img.active{
+  opacity:1;
+}
+
+/* ====== CONTENT ====== */
+.content{
+  padding:20px;
+  padding-bottom:100px;
+}
+
+.card{
+  background:rgba(255,255,255,0.05);
+  backdrop-filter:blur(15px);
+  border-radius:20px;
+  padding:20px;
+  margin-bottom:20px;
+  box-shadow:0 10px 25px rgba(0,0,0,0.6);
+  transition:0.3s;
+}
+
+.card h3{
+  margin:0 0 10px;
+  color:#ffd700;
+}
+
+.card p{
+  margin:0;
+  font-size:18px;
+  font-weight:bold;
+}
+
+/* ====== BOTTOM NAV ====== */
+.bottom-nav{
+  position:fixed;
+  bottom:0;
+  left:0;
+  width:100%;
+  background:rgba(0,0,0,0.95);
+  display:flex;
+  justify-content:space-around;
+  padding:15px 0;
+  box-shadow:0 -5px 25px rgba(0,0,0,0.8);
+}
+
+.bottom-nav button{
+  background:none;
+  border:none;
+  color:#fff;
+  font-size:22px;
+  cursor:pointer;
+  transition:0.3s;
+}
+
+.bottom-nav button:hover{
+  color:#ffd700;
+  transform:scale(1.2);
+}
+</style>
+</head>
+
+<body>
+<!-- HEADER -->
+<div class="topbar">
+  <div class="logo">
+    <i class="fas fa-crown crown"></i>
+    Osyam <span>VP</span>
+  </div>
+</div>
+
+<!-- ADS FADE -->
+<div class="ads-container">
+  <img src="https://i.postimg.cc/nhfKZJFk/Ew-Olzce-Wg-AIph-Cq.jpg" class="active">
+  <img src="https://i.postimg.cc/WbkmQ3vK/images-(21).jpg">
+  <img src="https://i.postimg.cc/tCxdLTjv/images-(22).jpg">
+  <img src="https://i.postimg.cc/hPd8HjB6/images-(23).jpg">
+  <img src="https://i.postimg.cc/Njv8YcsD/OSAM-1-Auto8.jpg">
+</div>
+
+<!-- CONTENT: الرصيد والمستوى وأحدث العمليات -->
+<div class="content">
+  <div class="card">
+    <h3>💰 الرصيد الحالي</h3>
+    <p id="balanceBox">0 دج</p>
+  </div>
+  <div class="card">
+    <h3>⭐ المستوى</h3>
+    <p>VIP 0</p>
+  </div>
+  <div class="card history" id="history">
+  <h3>🎁 احصل على هدية</h3>
+  <div id="historyList">
+    <button id="giftBtn" class="vp-btn">🎁 اضغط هنا</button>
+  </div>
+</div>
+
+<!-- اللوحة المنبثقة -->
+<div id="giftPopup" class="vp-popup">
+  <h3>ادخل رمزك</h3>
+  <input type="text" id="giftCode" placeholder="أدخل الرمز">
+  <div class="popup-buttons">
+    <button id="submitGift" class="vp-btn">✅ تحقق</button>
+    <button id="closeGift" class="vp-btn close-btn">❌ إغلاق</button>
+  </div>
+  <div id="giftStatus" class="gift-status"></div>
+</div>
+
+<style>
+.vp-btn{
+  padding:12px 20px;
+  border:none;
+  border-radius:20px;
+  background:linear-gradient(145deg,#111,#222);
+  color:#00ff00;
+  font-weight:bold;
+  font-size:16px;
+  cursor:pointer;
+  box-shadow:0 0 10px #00ff0033, 0 0 20px #00ff0055 inset;
+  transition:0.3s;
+  margin-top:10px;
+}
+.vp-btn:hover{
+  box-shadow:0 0 15px #00ff0055, 0 0 30px #00ff0077 inset;
+  transform:scale(1.05);
+}
+
+.vp-popup{
+  display:none;
+  position:fixed;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  background:rgba(20,20,20,0.95);
+  padding:25px;
+  border-radius:25px;
+  box-shadow:0 0 20px #00ff0033, inset 0 0 10px #00ff0033;
+  color:#0f0;
+  text-align:center;
+  min-width:300px;
+  z-index:999;
+}
+.vp-popup input{
+  width:80%;
+  padding:10px;
+  border-radius:15px;
+  border:none;
+  outline:none;
+  background:#111;
+  color:#0f0;
+  font-size:16px;
+  margin-top:10px;
+}
+.popup-buttons{
+  margin-top:15px;
+}
+.close-btn{
+  background:linear-gradient(145deg,#220000,#330000);
+  color:#ff5555;
+  margin-left:10px;
+}
+.gift-status{
+  margin-top:12px;
+  font-weight:bold;
+  color:#ff0;
+  min-height:20px;
+}
+</style>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+import { getFirestore, doc, getDoc, updateDoc, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+
+// إعداد Firebase
+const firebaseConfig = {
+  apiKey: "AIzaSyBiQ4dHe4sbKDIrsyF8WdpjV3sY4qAxU4E",
+  authDomain: "osim-d1821.firebaseapp.com",
+  projectId: "osim-d1821",
+  storageBucket: "osim-d1821.firebasestorage.app",
+  messagingSenderId: "464951343183",
+  appId: "1:464951343183:web:21c7615a90e4f38385923a"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+// العناصر
+const giftBtn = document.getElementById("giftBtn");
+const giftPopup = document.getElementById("giftPopup");
+const closeGift = document.getElementById("closeGift");
+const submitGift = document.getElementById("submitGift");
+const giftCodeInput = document.getElementById("giftCode");
+const giftStatus = document.getElementById("giftStatus");
+const balanceBox = document.getElementById("balanceBox");
+
+let uid = null;
+
+// فتح وإغلاق popup
+giftBtn.onclick = () => {
+  giftPopup.style.display = "block"; 
+  giftStatus.textContent = ""; 
+  giftCodeInput.value = "";
+}
+closeGift.onclick = () => { giftPopup.style.display = "none"; }
+
+// التأكد من تسجيل الدخول
+onAuthStateChanged(auth, user=>{
+  if(!user){ 
+    window.location.href = "login.html"; 
+    return; 
+  }
+  uid = user.uid;
+});
+
+// التحقق من الرمز وربطه بـ Firebase
+submitGift.onclick = async () => {
+  const code = giftCodeInput.value.trim().toUpperCase();
+  if(!code){ giftStatus.textContent="❌ أدخل رمز صحيح"; return; }
+  if(!uid){ giftStatus.textContent="❌ تسجيل الدخول مطلوب"; return; }
+
+  // البحث عن الرمز في مجموعة giftCodes
+  const q = query(collection(db,"giftCodes"), where("code","==",code));
+  const querySnap = await getDocs(q);
+
+  if(querySnap.empty){
+    giftStatus.textContent = "❌ الرمز غير صالح";
+    return;
+  }
+
+  const giftDoc = querySnap.docs[0];
+  const giftData = giftDoc.data();
+
+  // التأكد من عدم تجاوز عدد المستخدمين المسموح
+  const usedBy = giftData.usedBy || [];
+  const maxUsers = giftData.maxUsers || 1;
+
+  if(usedBy.includes(uid)){
+    giftStatus.textContent = "❌ لقد استخدمت هذا الرمز مسبقاً";
+    return;
+  }
+  if(usedBy.length >= maxUsers){
+    giftStatus.textContent = "❌ هذا الرمز انتهت صلاحيته";
+    return;
+  }
+
+  // إضافة الرصيد للمستخدم
+  const value = Number(giftData.amount || giftData.amount50 || 0);
+  const userRef = doc(db,"users",uid);
+  const userSnap = await getDoc(userRef);
+  let balance = 0;
+  if(userSnap.exists()){
+    balance = userSnap.data().balance || 0;
+  }
+  const newBalance = balance + value;
+
+  // تحديث رصيد المستخدم
+  await updateDoc(userRef,{ balance: newBalance });
+
+  // تحديث قائمة المستخدمين الذين استخدموا الرمز
+  usedBy.push(uid);
+  await updateDoc(doc(db,"giftCodes",giftDoc.id),{ usedBy });
+
+  // تحديث واجهة المستخدم
+  balanceBox.textContent = newBalance;
+  giftStatus.textContent = `✅ تم إضافة ${value} دج إلى رصيدك`;
+  giftCodeInput.value = "";
+};
+</script>
+
+<div class="bottom-nav">
+  <button onclick="location.href='http://localhost:8158/login.html'"><i class="fas fa-home"></i></button>
+  <button onclick="location.href='http://localhost:8158/wheel.html'"><i class="fas fa-chart-line"></i></button>
+  <button onclick="location.href='deposit.html'"><i class="fas fa-piggy-bank"></i></button>
+  <button onclick="location.href='withdraw.html'"><i class="fas fa-money-bill-wave"></i></button>
+  <button onclick="location.href='referral.html'"><i class="fas fa-users"></i></button>
+  <button onclick="location.href='tasks.html'"><i class="fas fa-tasks"></i></button>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+
+// إعداد Firebase
+const firebaseConfig = {
+  apiKey: "AIzaSyBiQ4dHe4sbKDIrsyF8WdpjV3sY4qAxU4E",
+  authDomain: "osim-d1821.firebaseapp.com",
+  projectId: "osim-d1821",
+  storageBucket: "osim-d1821.firebasestorage.app",
+  messagingSenderId: "464951343183",
+  appId: "1:464951343183:web:21c7615a90e4f38385923a"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
+
+const balanceBox = document.getElementById("balanceBox");
+
+// التحقق من حالة تسجيل الدخول
+onAuthStateChanged(auth, async (user) => {
+  if(user){
+    // المستخدم مسجل دخول، نجيب بياناته
+    const userSnap = await getDoc(doc(db,"users",user.uid));
+    if(userSnap.exists()){
+      const data = userSnap.data();
+      balanceBox.textContent = (data.balance || 0) + " دج";
+      // ممكن تضيف المستوى والعمليات بنفس الطريقة
+      document.querySelector(".content .card:nth-child(2) p").textContent = "VIP " + (data.level || 0);
+      document.querySelector(".content .card:nth-child(3) p").textContent = (data.latestOperations || "لا توجد عمليات حالياً");
+    }
+  }else{
+    // المستخدم غير مسجل دخول
+    alert("❌ الرجاء تسجيل الدخول أولاً");
+    window.location.href = "login.html"; // تحويل لصفحة تسجيل الدخول
+  }
+});
+</script>
+</body><!-- زر لفتح اللوحة المنبثقة -->
+<button id="openLinks" class="vp-btn">🌐 روابطنا</button>
+
+<!-- اللوحة المنبثقة -->
+<div id="linksPopup" class="vp-popup">
+  <h3>🔗 انضم لمجموعاتنا وحمّل التطبيق</h3>
+  <div class="popup-buttons">
+    <button onclick="window.open('https://chat.whatsapp.com/HUK4pE0BbRFFKmfjefChCq','_blank')" class="vp-btn">💬 مجموعة واتساب</button>
+    <button onclick="window.open('https://t.me/+mtRU5ON0f4MzZDFk','_blank')" class="vp-btn">📱 مجموعة تيلغرام</button>
+    <button onclick="window.location.href='app-download.html'" class="vp-btn">⬇️ تحميل التطبيق</button>
+    <button id="closeLinks" class="vp-btn close-btn">❌ إغلاق</button>
+  </div>
+</div>
+
+<style>
+/* زر VP موجود مسبقاً */
+.vp-popup{
+  display:none;
+  position:fixed;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  background:rgba(20,20,20,0.85); /* لون شفاف */
+  padding:25px;
+  border-radius:25px;
+  box-shadow:0 0 20px #00ff0033, inset 0 0 10px #00ff0033;
+  color:#0f0;
+  text-align:center;
+  min-width:300px;
+  z-index:999;
+}
+.vp-popup h3{
+  margin-bottom:15px;
+  color:#ffd700;
+}
+.popup-buttons{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  margin-top:10px;
+}
+.close-btn{
+  background:linear-gradient(145deg,#220000,#330000);
+  color:#ff5555;
+  margin-top:10px;
+}
+</style>
+
+<script>
+// فتح وإغلاق اللوحة
+const openLinks = document.getElementById('openLinks');
+const linksPopup = document.getElementById('linksPopup');
+const closeLinks = document.getElementById('closeLinks');
+
+openLinks.onclick = () => { linksPopup.style.display = 'block'; }
+closeLinks.onclick = () => { linksPopup.style.display = 'none'; }
+</script>
+</html>
