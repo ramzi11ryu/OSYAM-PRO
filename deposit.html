@@ -148,10 +148,9 @@ hr{
   <!-- Deposit Card -->
   <div class="card">
     <div class="card-title">💳 تسجيل الإيداع</div>
-
-    <div id="copyBox" class="copy-box" onclick="copyCCP()">
-      📋 نسخ رقم 00799999002084015427
-    </div>
+<div id="copyBox" class="copy-box" onclick="copyCCP()">
+  📋 نسخ رقم ••••••••••••••••5427
+</div>
 
     <br>
 
@@ -297,17 +296,15 @@ const amountInput=document.getElementById("amount");
 const phoneInput=document.getElementById("phone");
 const userCCPInput=document.getElementById("userCCP");
 </script>
-
 <script>
 function copyCCP(){
   const box=document.getElementById("copyBox");
   navigator.clipboard.writeText("00799999002084015427");
-  box.innerText="✅ تم النسخ";
+  box.innerText="✅ تم نسخ الرقم الكامل";
   setTimeout(()=>{
-    box.innerText="📋 نسخ رقم 00799999002084015427";
+    box.innerText="📋 نسخ رقم ••••••••••••••••5427";
   },1500);
 }
 </script>
-
 </body>
 </html>
