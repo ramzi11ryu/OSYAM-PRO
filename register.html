@@ -1,78 +1,112 @@
-<!-- شريط إعلان رمضان -->
-<div class="ramadan-banner">🌙 رمضان كريم - كل يوم مبارك! 🌙</div>
-
-<style>
-/* شريط الإعلان أسود مع ضوء متحرك */
-.ramadan-banner{
-    width:100%;
-    text-align:center;
-    font-size:20px;
-    font-weight:bold;
-    padding:10px 0;
-    background:#000; /* خلفية سوداء */
-    color:#fff;
-    text-shadow: 0 0 5px #fff, 0 0 10px #fff; /* ضوء النص */
-    animation:glow 2s ease-in-out infinite alternate;
-    box-shadow:0 4px 12px rgba(0,0,0,0.5);
-    position:sticky;
-    top:0;
-    z-index:999;
-}
-
-/* تأثير ضوء النص */
-@keyframes glow{
-    0%{
-        text-shadow: 0 0 5px #fff, 0 0 10px #fff;
-        color:#e0e0e0;
-    }
-    50%{
-        text-shadow: 0 0 15px #fff, 0 0 30px #fff;
-        color:#fff;
-    }
-    100%{
-        text-shadow: 0 0 5px #fff, 0 0 10px #fff;
-        color:#e0e0e0;
-    }
-}
-</style>
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>منصة رمضان - الاستثمار + المهام</title>
+
+<!-- شريط إعلان رمضان -->
 <style>
-body{margin:0;font-family:Arial;background:#f4f6f9;}
-header{background:#111827;color:#fff;padding:15px;text-align:center;font-weight:bold;font-size:22px;}
+.ramadan-banner{
+    width:100%;
+    text-align:center;
+    font-size:20px;
+    font-weight:bold;
+    padding:10px 0;
+    background:#000;
+    color:#fff;
+    text-shadow: 0 0 5px #fff, 0 0 10px #fff;
+    animation:glow 2s ease-in-out infinite alternate;
+    box-shadow:0 4px 12px rgba(0,0,0,0.5);
+    position:sticky;
+    top:0;
+    z-index:999;
+}
+@keyframes glow{
+    0%{ text-shadow:0 0 5px #fff,0 0 10px #fff; color:#e0e0e0; }
+    50%{ text-shadow:0 0 15px #fff,0 0 30px #fff; color:#fff; }
+    100%{ text-shadow:0 0 5px #fff,0 0 10px #fff; color:#e0e0e0; }
+}
+body{margin:0;font-family:Arial;background:#1f1f1f;color:#e0e0e0;}
+header{background:#000;color:#fff;padding:15px;text-align:center;font-weight:bold;font-size:22px;}
 .container{padding:15px;}
-.card{background:#fff;padding:15px;border-radius:12px;margin-bottom:15px;box-shadow:0 4px 8px rgba(0,0,0,0.1);}
+.card{
+    background: linear-gradient(145deg,#2a2a2a,#1a1a1a);
+    color:#e0e0e0;
+    padding:20px;
+    border-radius:12px;
+    margin-bottom:20px;
+    box-shadow:0 4px 12px rgba(0,0,0,0.7);
+    transition: all 0.3s ease;
+    border:2px solid #333;
+}
+.card:hover{
+    box-shadow:0 8px 20px rgba(255,255,255,0.2);
+    border:2px solid #888;
+}
 button{
-    padding:10px 15px;
+    padding:10px 20px;
     border:none;
     border-radius:8px;
-    margin-top:10px;
+    margin-top:15px;
     color:#fff;
     font-size:16px;
     cursor:pointer;
-    background:#000;
-    box-shadow:0 4px 8px rgba(128,128,128,0.5);
+    background:#333;
+    box-shadow:0 4px 8px rgba(0,0,0,0.7);
+    transition: all 0.3s ease;
 }
-button:hover{background:#111;box-shadow:0 6px 12px rgba(128,128,128,0.7);}
-button:disabled{background:gray;cursor:not-allowed;}
-.message{margin-bottom:10px;font-size:16px;color:#111;}
-.info{background:#fff;padding:10px;border-radius:10px;margin-bottom:15px;}
+button:hover{
+    background:#555;
+    box-shadow:0 6px 12px rgba(255,255,255,0.3);
+}
+button:disabled{
+    background:gray;
+    cursor:not-allowed;
+}
+.message{margin-bottom:10px;font-size:16px;color:#fff;}
+.info{
+    background:#2a2a2a;
+    padding:10px;
+    border-radius:10px;
+    margin-bottom:15px;
+    color:#e0e0e0;
+    box-shadow:0 4px 8px rgba(0,0,0,0.5);
+}
 .overlay{
-    position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);display:none;justify-content:center;align-items:center;
+    position:fixed;
+    top:0; left:0; width:100%; height:100%;
+    background:rgba(0,0,0,0.8);
+    display:none;
+    justify-content:center;
+    align-items:center;
+    z-index:10000;
 }
 .popup{
-    background:#fff;padding:20px;border-radius:12px;max-width:400px;text-align:center;box-shadow:0 8px 16px rgba(0,0,0,0.3);
+    background:#2a2a2a;
+    color:#fff;
+    padding:20px;
+    border-radius:12px;
+    max-width:400px;
+    text-align:center;
+    box-shadow:0 8px 16px rgba(0,0,0,0.9);
 }
-.popup button{margin-top:15px;background:#2563eb;}
+.popup button{
+    margin-top:15px;
+    padding:8px 16px;
+    border:none;
+    border-radius:8px;
+    background:#555;
+    color:#fff;
+    cursor:pointer;
+}
+.popup button:hover{background:#777;}
 </style>
 </head>
 <body>
 
-<header> اقل دفع  منصة رمضان 🌙 - الاستثمار2 والمهام</header>
+<div class="ramadan-banner">🌙 رمضان كريم - كل يوم مبارك! 🌙</div>
+<header>منصة رمضان 🌙 - الاستثمار والمهام</header>
 
 <div class="container">
 <div class="info">
@@ -108,30 +142,34 @@ button:disabled{background:gray;cursor:not-allowed;}
 
 <!-- المهام اليومية -->
 <h2 style="margin-top:20px;text-align:center;">مهام رمضان اليومية</h2>
+
 <div class="card">
 <h3>المهمة الأولى</h3>
 <div class="message" id="task1Msg"></div>
 <button id="task1Btn" onclick="completeTask('task1',0)">عرض الرسالة الدينية</button>
+<div id="task1Timer" style="margin-top:5px;color:#fff;"></div>
 </div>
 
 <div class="card">
 <h3>المهمة الثانية</h3>
 <div class="message" id="task2Msg"></div>
 <button id="task2Btn" onclick="completeTask('task2',1)">عرض الرسالة الدينية</button>
+<div id="task2Timer" style="margin-top:5px;color:#fff;"></div>
 </div>
 
 <div class="card">
 <h3>المهمة الثالثة</h3>
 <div class="message" id="task3Msg"></div>
 <button id="task3Btn" onclick="completeTask('task3',2)">عرض الرسالة الدينية</button>
+<div id="task3Timer" style="margin-top:5px;color:#fff;"></div>
 </div>
 </div>
 
 <!-- نافذة منبثقة -->
 <div class="overlay" id="overlay">
     <div class="popup">
-        <div id="popupMessage"></div>
-        <button onclick="closePopup()">إغلاق</button>
+        <div id="popupMessage">🕌 رمضان كريم 🌙</div>
+        <button id="closePopupBtn">إغلاق</button>
     </div>
 </div>
 
@@ -140,7 +178,6 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebas
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
 import { getFirestore, doc, getDoc, collection, addDoc, updateDoc, serverTimestamp, onSnapshot } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
 
-// إعداد Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyBiQ4dHe4sbKDIrsyF8WdpjV3sY4qAxU4E",
   authDomain: "osim-d1821.firebaseapp.com",
@@ -157,38 +194,17 @@ const db = getFirestore(app);
 let currentUser;
 let profits = {"C":17,"G":30,"R":47};
 
-// 30 رسالة دينية
 const messages = [
-  "🕌 صِل رحمك وأحسن إلى جارك",
-  "📖 تلاوة القرآن نور للقلوب",
-  "🤲 الصدقة تطفئ غضب الرحمن",
-  "🕌 من صلى البردين دخل الجنة",
-  "📖 تعلم العلم فريضة على كل مسلم",
-  "🤲 أفضل الأعمال أدومها وإن قل",
-  "🕌 صوم يوم واحد يكفر ذنوب سنة",
-  "📖 القرآن شفيع لأصحابه يوم القيامة",
-  "🤲 بر الوالدين طريق الجنة",
-  "🕌 ذكر الله عبادة يومية",
-  "📖 الصبر مفتاح الفرج",
-  "🤲 الإحسان إلى الناس محبوب عند الله",
-  "🕌 صلاة الفجر جماعة في المسجد",
-  "📖 قراءة سورة البقرة بركة للبيت",
-  "🤲 حسن الخلق أحب إلى الله",
-  "🕌 صوم رمضان عبادة وطاعة",
-  "📖 الدعاء يرفع البلاء",
-  "🤲 رفق بالحيوان عبادة",
-  "🕌 التصدق سر الخلود",
-  "📖 الدعاء للمؤمنين حسن عظيم",
-  "🤲 الابتسامة في وجه أخيك صدقة",
-  "🕌 المحافظة على الصلاة",
-  "📖 الإحسان للجار",
-  "🤲 صلة الرحم تزيد الرزق",
-  "🕌 التوبة النصوح تجلب رضا الله",
-  "📖 قراءة الأذكار صباحاً ومساءً",
-  "🤲 الحج والعمرة أعمال مقبولة",
-  "🕌 ذكر الله في كل وقت",
-  "📖 صبر الإنسان على البلاء",
-  "🤲 الإحسان للوالدين"
+"🕌 صِل رحمك وأحسن إلى جارك","📖 تلاوة القرآن نور للقلوب","🤲 الصدقة تطفئ غضب الرحمن",
+"🕌 من صلى البردين دخل الجنة","📖 تعلم العلم فريضة على كل مسلم","🤲 أفضل الأعمال أدومها وإن قل",
+"🕌 صوم يوم واحد يكفر ذنوب سنة","📖 القرآن شفيع لأصحابه يوم القيامة","🤲 بر الوالدين طريق الجنة",
+"🕌 ذكر الله عبادة يومية","📖 الصبر مفتاح الفرج","🤲 الإحسان إلى الناس محبوب عند الله",
+"🕌 صلاة الفجر جماعة في المسجد","📖 قراءة سورة البقرة بركة للبيت","🤲 حسن الخلق أحب إلى الله",
+"🕌 صوم رمضان عبادة وطاعة","📖 الدعاء يرفع البلاء","🤲 رفق بالحيوان عبادة",
+"🕌 التصدق سر الخلود","📖 الدعاء للمؤمنين حسن عظيم","🤲 الابتسامة في وجه أخيك صدقة",
+"🕌 المحافظة على الصلاة","📖 الإحسان للجار","🤲 صلة الرحم تزيد الرزق",
+"🕌 التوبة النصوح تجلب رضا الله","📖 قراءة الأذكار صباحاً ومساءً","🤲 الحج والعمرة أعمال مقبولة",
+"🕌 ذكر الله في كل وقت","📖 صبر الإنسان على البلاء","🤲 الإحسان للوالدين"
 ];
 
 let dailyMessages = ["", "", ""];
@@ -198,6 +214,7 @@ onAuthStateChanged(auth, async (user)=>{
         currentUser = user;
         await loadUser();
         await loadDailyMessages();
+        startTaskTimers();
     } else {
         alert("سجل دخول أولا");
         window.location.href="login.html";
@@ -221,7 +238,6 @@ async function loadUser(){
         document.getElementById("daysLeft").innerText = diff>0 ? diff : 0;
     }
 
-    // تعطيل المهام إذا لم تمر 24 ساعة
     ["task1","task2","task3"].forEach(task=>{
         if(data[task]){
             let last = new Date(data[task]);
@@ -232,7 +248,6 @@ async function loadUser(){
         }
     });
 
-    // مراقبة الموافقة على الاستثمار
     onSnapshot(collection(db,"investmentRequests"), snapshot=>{
         snapshot.docs.forEach(async docSnap=>{
             const req = docSnap.data();
@@ -279,7 +294,7 @@ window.requestInvestment = async function(planName,price){
     alert("تم إرسال طلب الاستثمار ✅ انتظر الموافقة من الإدارة");
 };
 
-// تنفيذ المهمة + عرض الرسالة
+// تنفيذ المهمة
 window.completeTask = async function(taskId,index){
     const userRef = doc(db,"users",currentUser.uid);
     const snap = await getDoc(userRef);
@@ -290,26 +305,35 @@ window.completeTask = async function(taskId,index){
         let last = new Date(data[taskId]);
         let diff = (now - last)/(1000*60*60);
         if(diff < 24){
-            alert("انتظر حتى مرور 24 ساعة لإنجاز المهمة مرة أخرى ⏳");
+            alert("⏳ الوقت لم ينتهي بعد، حاول لاحقاً");
             return;
         }
     }
 
-    let planChar = (data.plan || "").slice(-1);
-    let profitAmount = profits[planChar] || 0;
-    let newBalance = (data.balance || 0) + profitAmount;
-
-    await updateDoc(userRef,{
-        balance: newBalance,
-        [taskId]: now.toISOString()
-    });
-
-    document.getElementById("balance").innerText = newBalance;
+    await updateDoc(userRef,{ [taskId]: now.toISOString() });
     document.getElementById(taskId+"Btn").disabled = true;
 
-    // عرض الرسالة المنبثقة
     document.getElementById("popupMessage").innerText = dailyMessages[index] || "🕌 رمضان كريم 🌙";
     document.getElementById("overlay").style.display = "flex";
+
+    // تحقق اكتمال 3 مهام
+    const updatedSnap = await getDoc(userRef);
+    const updatedData = updatedSnap.data();
+    let tasks = ["task1","task2","task3"];
+    let completedToday = tasks.every(t=>{
+        if(!updatedData[t]) return false;
+        return (now - new Date(updatedData[t]))/(1000*60*60) < 24;
+    });
+
+    if(completedToday){
+        let planChar = (updatedData.plan || "").slice(-1);
+        let profitAmount = profits[planChar] || 0;
+        let newBalance = (updatedData.balance || 0) + profitAmount;
+
+        await updateDoc(userRef,{ balance: newBalance });
+        document.getElementById("balance").innerText = newBalance;
+        alert("🎉 مبروك! كملت 3 مهام وربحت " + profitAmount + " دج");
+    }
 };
 
 // تحميل الرسائل اليومية
@@ -320,7 +344,7 @@ async function loadDailyMessages(){
     let now = new Date();
     let dayIndex = 0;
 
-    if(!data.lastPopup || data.lastPopup === null || data.popupIndex === undefined){
+    if(!data.lastPopup || data.popupIndex === undefined){
         dayIndex = 0;
         await updateDoc(userRef,{
             lastPopup: now.toISOString(),
@@ -328,7 +352,7 @@ async function loadDailyMessages(){
         });
     } else {
         let last = new Date(data.lastPopup);
-        let diff = (now - last)/(1000*60*60); // بالساعة
+        let diff = (now - last)/(1000*60*60);
         dayIndex = data.popupIndex || 0;
         if(diff >= 24){
             dayIndex = (dayIndex + 1) % 10;
@@ -342,7 +366,6 @@ async function loadDailyMessages(){
     let start = dayIndex*3;
     dailyMessages = messages.slice(start, start+3);
 
-    // تحديث نصوص المهام على الصفحة
     for(let i=1;i<=3;i++){
         if(dailyMessages[i-1]){
             document.getElementById(`task${i}Msg`).innerText = dailyMessages[i-1];
@@ -350,89 +373,48 @@ async function loadDailyMessages(){
     }
 }
 
-function closePopup(){
-    document.getElementById("overlay").style.display = "none";
-}
-</script><style>
-body{margin:0;font-family:Arial;background:#1f1f1f;color:#e0e0e0;}
-header{background:#000;color:#fff;padding:15px;text-align:center;font-weight:bold;font-size:22px;}
-.container{padding:15px;}
-
-/* بطاقات الاستثمار VP */
-.card{
-    background: linear-gradient(145deg,#2a2a2a,#1a1a1a);
-    color:#e0e0e0;
-    padding:20px;
-    border-radius:12px;
-    margin-bottom:20px;
-    box-shadow:0 4px 12px rgba(0,0,0,0.7);
-    transition: all 0.3s ease;
-    border:2px solid #333; /* حدود أساسية */
-}
-.card:hover{
-    box-shadow:0 8px 20px rgba(255,255,255,0.2);
-    border:2px solid #888; /* حدود مضيئة عند hover */
-}
-
-/* زر الاستثمار */
-button{
-    padding:10px 20px;
-    border:none;
-    border-radius:8px;
-    margin-top:15px;
-    color:#fff;
-    font-size:16px;
-    cursor:pointer;
-    background:#333;
-    box-shadow:0 4px 8px rgba(0,0,0,0.7);
-    transition: all 0.3s ease;
-}
-button:hover{
-    background:#555;
-    box-shadow:0 6px 12px rgba(255,255,255,0.3);
-}
-button:disabled{
-    background:gray;
-    cursor:not-allowed;
+// العد التنازلي لكل مهمة
+function updateTaskTimers(data){
+    ["task1","task2","task3"].forEach(task=>{
+        const timerEl = document.getElementById(task+"Timer");
+        if(data[task]){
+            let last = new Date(data[task]);
+            let now = new Date();
+            let diff = 24*60*60*1000 - (now - last);
+            if(diff > 0){
+                let hours = Math.floor(diff/3600000);
+                let minutes = Math.floor((diff%3600000)/60000);
+                let seconds = Math.floor((diff%60000)/1000);
+                timerEl.innerText = `⏳ الوقت المتبقي: ${hours}س ${minutes}د ${seconds}ث`;
+                document.getElementById(task+"Btn").disabled = true;
+            } else {
+                timerEl.innerText = "✅ يمكنك تنفيذ المهمة الآن";
+                document.getElementById(task+"Btn").disabled = false;
+            }
+        } else {
+            timerEl.innerText = "✅ يمكنك تنفيذ المهمة الآن";
+            document.getElementById(task+"Btn").disabled = false;
+        }
+    });
 }
 
-/* نصوص المهام */
-.message{margin-bottom:10px;font-size:16px;color:#fff;}
-.info{
-    background:#2a2a2a;
-    padding:10px;
-    border-radius:10px;
-    margin-bottom:15px;
-    color:#e0e0e0;
-    box-shadow:0 4px 8px rgba(0,0,0,0.5);
+// تشغيل العد كل ثانية
+function startTaskTimers(){
+    setInterval(async ()=>{
+        if(!currentUser) return;
+        const userRef = doc(db,"users",currentUser.uid);
+        const snap = await getDoc(userRef);
+        if(snap.exists()){
+            updateTaskTimers(snap.data());
+        }
+    },1000);
 }
 
-/* نافذة منبثقة */
-.overlay{
-    position:fixed;
-    top:0;left:0;width:100%;height:100%;
-    background:rgba(0,0,0,0.8);
-    display:none;
-    justify-content:center;
-    align-items:center;
-}
-.popup{
-    background:#2a2a2a;
-    color:#e0e0e0;
-    padding:20px;
-    border-radius:12px;
-    max-width:400px;
-    text-align:center;
-    box-shadow:0 8px 16px rgba(0,0,0,0.9);
-}
-.popup button{
-    margin-top:15px;
-    background:#555;
-}
-.popup button:hover{
-    background:#777;
-}
-</style>
-
+document.addEventListener("DOMContentLoaded", () => {
+    const overlay = document.getElementById("overlay");
+    const closeBtn = document.getElementById("closePopupBtn");
+    closeBtn.onclick = () => { overlay.style.display = "none"; };
+});
+</script>
 </body>
 </html>
