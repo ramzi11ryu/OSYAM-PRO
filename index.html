@@ -443,6 +443,7 @@ openLinks.onclick = () => { linksPopup.style.display = 'block'; }
 closeLinks.onclick = () => { linksPopup.style.display = 'none'; }
 </script>
 </html><!-- زر هلال رمضان ثابت -->
+<!-- زر هلال رمضان ثابت -->
 <button id="moonBtn" class="vp-moon">🌙</button>
 
 <style>
@@ -476,10 +477,12 @@ closeLinks.onclick = () => { linksPopup.style.display = 'none'; }
 // الانتقال عند الضغط
 const moonBtn = document.getElementById('moonBtn');
 moonBtn.onclick = () => {
-  window.location.href = "unsaved_file__.html"; // ضع هنا رابط الصفحة
+  // ضع هنا الرابط الصحيح للصفحة
+  window.location.href = "register.html"; // إذا نفس المجلد
+  // أو "pages/register.html" إذا في مجلد فرعي
 };
 
-// ظهور واختفاء تلقائي كل 5 ثواني
+// ظهور واختفاء تلقائي كل 3 ثواني
 let visible = true;
 setInterval(() => {
   visible = !visible;
