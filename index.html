@@ -442,4 +442,47 @@ const closeLinks = document.getElementById('closeLinks');
 openLinks.onclick = () => { linksPopup.style.display = 'block'; }
 closeLinks.onclick = () => { linksPopup.style.display = 'none'; }
 </script>
-</html>
+</html><!-- زر هلال رمضان ثابت -->
+<button id="moonBtn" class="vp-moon">🌙</button>
+
+<style>
+.vp-moon{
+  position:fixed;
+  bottom:20px;
+  right:20px;
+  width:60px;
+  height:60px;
+  border-radius:50%;
+  background: linear-gradient(145deg,#111,#222);
+  border: 2px solid #444;
+  color:#ffd700;
+  font-size:28px;
+  cursor:pointer;
+  box-shadow: 0 0 10px #ffd70055, 0 0 20px #ffd70033 inset;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.5s ease;
+  z-index:1000;
+  opacity:1; /* البداية مرئية */
+}
+.vp-moon:hover{
+  box-shadow:0 0 20px #ffd70077, 0 0 30px #ffd70055 inset;
+  transform: scale(1.2);
+}
+</style>
+
+<script>
+// الانتقال عند الضغط
+const moonBtn = document.getElementById('moonBtn');
+moonBtn.onclick = () => {
+  window.location.href = "unsaved_file__.html"; // ضع هنا رابط الصفحة
+};
+
+// ظهور واختفاء تلقائي كل 5 ثواني
+let visible = true;
+setInterval(() => {
+  visible = !visible;
+  moonBtn.style.opacity = visible ? 1 : 0;
+}, 3000);
+</script>
