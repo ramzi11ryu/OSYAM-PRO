@@ -147,21 +147,19 @@ button:disabled{
 
   <div class="card history" id="history">لا توجد عمليات</div>
 </div>
-
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
 import { getFirestore, doc, getDoc, updateDoc, collection, addDoc, query, where, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
 
-// Firebase الجديد
 const firebaseConfig = {
-  apiKey: "AIzaSyBiQ4dHe4sbKDIrsyF8WdpjV3sY4qAxU4E",
-  authDomain: "osim-d1821.firebaseapp.com",
-  projectId: "osim-d1821",
-  storageBucket: "osim-d1821.firebasestorage.app",
-  messagingSenderId: "464951343183",
-  appId: "1:464951343183:web:21c7615a90e4f38385923a",
-  measurementId: "G-KSVDWLYNV6"
+apiKey:"AIzaSyBiQ4dHe4sbKDIrsyF8WdpjV3sY4qAxU4E",
+authDomain:"osim-d1821.firebaseapp.com",
+projectId:"osim-d1821",
+storageBucket:"osim-d1821.firebasestorage.app",
+messagingSenderId:"464951343183",
+appId:"1:464951343183:web:21c7615a90e4f38385923a",
+measurementId:"G-KSVDWLYNV6"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -180,136 +178,122 @@ const accountInput=document.getElementById("account");
 const pinInput=document.getElementById("pin");
 
 onAuthStateChanged(auth, async user=>{
-  if(!user){ window.location.href="login.html"; return; }
-  uid=user.uid;
-  await loadUser();
-  loadHistory();
-  checkWithdrawAvailability();
+if(!user){ window.location.href="login.html"; return; }
+
+uid=user.uid;
+await loadUser();
+loadHistory();
+checkWithdrawTime();
+setInterval(checkWithdrawTime,60000);
 });
 
 async function loadUser(){
-  const ref=doc(db,"users",uid);
-  const snap=await getDoc(ref);
-  if(snap.exists()){
-    balance = snap.data().balance || 0;
-    totalDeposit = snap.data().totalDeposit || 0;
-    if(snap.data().account){
-      accountInput.value = snap.data().account;
-      accountInput.disabled = true;
-    }
-  }
-  balanceBox.textContent = balance;
+const ref=doc(db,"users",uid);
+const snap=await getDoc(ref);
+
+if(snap.exists()){
+balance=snap.data().balance||0;
+totalDeposit=snap.data().totalDeposit||0;
+
+if(snap.data().account){
+accountInput.value=snap.data().account;
+accountInput.disabled=true;
+}
 }
 
-function checkWithdrawAvailability(){
-  if(totalDeposit <=0){
-    withdrawBtn.disabled=true;
-    statusBox.textContent="🔒 السحب متاح بعد الإيداع";
-    return;
-  }
-  withdrawBtn.disabled=false;
-  statusBox.textContent="جاهز";
+balanceBox.textContent=balance;
 }
 
+function checkWithdrawTime(){
+const now=new Date();
+const algeriaTime=new Date(
+now.toLocaleString("en-US",{timeZone:"Africa/Algiers"})
+);
 
-  withdrawBtn.onclick=async()=>{
+const hour=algeriaTime.getHours();
 
-  if(withdrawBtn.disabled) return;
+if(hour<9 || hour>=17 || totalDeposit<=0){
+withdrawBtn.disabled=true;
 
-  // ✅ شرط الوقت
-  const now = new Date();
-  const hour = now.getHours();
+if(totalDeposit<=0){
+statusBox.textContent="🔒 السحب متاح بعد الإيداع";
+}else{
+statusBox.textContent="⛔ السحب مغلق حالياً (09:00 - 17:00)";
+}
 
-  if(hour < 9 || hour >= 17){
-    statusBox.textContent="⛔ السحب متاح فقط من 09:00 إلى 17:00";
-    return;
-  }
+return;
+}
 
-  const amount=Number(amountInput.value);
-  const account=accountInput.value.trim();
-  const pin=pinInput.value.trim();
+withdrawBtn.disabled=false;
+statusBox.textContent="جاهز";
+}
 
-  if(!amount||!account||!pin){
-    statusBox.textContent="❌ معلومات ناقصة";
-    return;
-  }
+withdrawBtn.onclick=async()=>{
 
-  if(amount<1000){
-    statusBox.textContent="❌ الحد الأدنى 1000 دج";
-    return;
-  }
+if(withdrawBtn.disabled) return;
 
-  if(amount>balance){
-    statusBox.textContent="💸 رصيد غير كافي";
-    return;
-  }
+const amount=Number(amountInput.value);
+const account=accountInput.value.trim();
+const pin=pinInput.value.trim();
 
-  const userRef = doc(db,"users",uid);
-  const snap = await getDoc(userRef);
+if(!amount||!account||!pin){
+statusBox.textContent="❌ معلومات ناقصة";
+return;
+}
 
-  if(!snap.data().account){
-    await updateDoc(userRef,{account});
-    accountInput.disabled = true;
-  }
+if(amount<1000){
+statusBox.textContent="❌ الحد الأدنى 1000 دج";
+return;
+}
 
-  await addDoc(collection(db,"withdraws"),{
-    uid, amount, account, pin,
-    status:"قيد المعالجة",
-    createdAt:serverTimestamp()
-  });
+if(amount>balance){
+statusBox.textContent="💸 رصيد غير كافي";
+return;
+}
 
-  balance-=amount;
-  await updateDoc(doc(db,"users",uid),{balance});
-  balanceBox.textContent = balance;
+const userRef=doc(db,"users",uid);
+const snap=await getDoc(userRef);
 
-  statusBox.textContent="✅ تم إرسال طلب السحب";
+if(!snap.data().account){
+await updateDoc(userRef,{account});
+accountInput.disabled=true;
+}
 
-  amountInput.value="";
-  pinInput.value="";
-};
+await addDoc(collection(db,"withdraws"),{
+uid,
+amount,
+account,
+pin,
+status:"قيد المعالجة",
+createdAt:serverTimestamp()
+});
 
-  const amount=Number(amountInput.value);
-  const account=accountInput.value.trim();
-  const pin=pinInput.value.trim();
+balance-=amount;
+await updateDoc(doc(db,"users",uid),{balance});
+balanceBox.textContent=balance;
 
-  if(!amount||!account||!pin){ statusBox.textContent="❌ معلومات ناقصة"; return; }
-  if(amount<1000){ statusBox.textContent="❌ الحد الأدنى 1000 دج"; return; }
-  if(amount>balance){ statusBox.textContent="💸 رصيد غير كافي"; return; }
+statusBox.textContent="✅ تم إرسال طلب السحب";
 
-  const userRef = doc(db,"users",uid);
-  const snap = await getDoc(userRef);
-  if(!snap.data().account){
-    await updateDoc(userRef,{account});
-    accountInput.disabled = true;
-  }
-
-  await addDoc(collection(db,"withdraws"),{
-    uid, amount, account, pin,
-    status:"قيد المعالجة",
-    createdAt:serverTimestamp()
-  });
-
-  balance-=amount;
-  await updateDoc(doc(db,"users",uid),{balance});
-  balanceBox.textContent = balance;
-  statusBox.textContent="✅ تم إرسال طلب السحب";
-
-  amountInput.value="";
-  pinInput.value="";
+amountInput.value="";
+pinInput.value="";
 };
 
 function loadHistory(){
-  const q=query(collection(db,"withdraws"), where("uid","==",uid));
-  onSnapshot(q,snap=>{
-    let html="";
-    snap.forEach(d=>{
-      const x=d.data();
-      if(x.createdAt){
-        html+=`💰 ${x.amount} دج – ${x.status}<br>🕒 ${x.createdAt.toDate().toLocaleString()}<hr>`;
-      }
-    });
-    historyBox.innerHTML = html || "لا توجد عمليات";
-  });
+const q=query(collection(db,"withdraws"),where("uid","==",uid));
+
+onSnapshot(q,snap=>{
+let html="";
+
+snap.forEach(d=>{
+const x=d.data();
+if(x.createdAt){
+html+=`💰 ${x.amount} دج – ${x.status}<br>
+🕒 ${x.createdAt.toDate().toLocaleString()}<hr>`;
+}
+});
+
+historyBox.innerHTML=html||"لا توجد عمليات";
+});
 }
 </script>
 
