@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -210,8 +211,62 @@ function checkWithdrawAvailability(){
   statusBox.textContent="جاهز";
 }
 
-withdrawBtn.onclick=async()=>{
+
+  withdrawBtn.onclick=async()=>{
+
   if(withdrawBtn.disabled) return;
+
+  // ✅ شرط الوقت
+  const now = new Date();
+  const hour = now.getHours();
+
+  if(hour < 9 || hour >= 17){
+    statusBox.textContent="⛔ السحب متاح فقط من 09:00 إلى 17:00";
+    return;
+  }
+
+  const amount=Number(amountInput.value);
+  const account=accountInput.value.trim();
+  const pin=pinInput.value.trim();
+
+  if(!amount||!account||!pin){
+    statusBox.textContent="❌ معلومات ناقصة";
+    return;
+  }
+
+  if(amount<1000){
+    statusBox.textContent="❌ الحد الأدنى 1000 دج";
+    return;
+  }
+
+  if(amount>balance){
+    statusBox.textContent="💸 رصيد غير كافي";
+    return;
+  }
+
+  const userRef = doc(db,"users",uid);
+  const snap = await getDoc(userRef);
+
+  if(!snap.data().account){
+    await updateDoc(userRef,{account});
+    accountInput.disabled = true;
+  }
+
+  await addDoc(collection(db,"withdraws"),{
+    uid, amount, account, pin,
+    status:"قيد المعالجة",
+    createdAt:serverTimestamp()
+  });
+
+  balance-=amount;
+  await updateDoc(doc(db,"users",uid),{balance});
+  balanceBox.textContent = balance;
+
+  statusBox.textContent="✅ تم إرسال طلب السحب";
+
+  amountInput.value="";
+  pinInput.value="";
+};
 
   const amount=Number(amountInput.value);
   const account=accountInput.value.trim();
