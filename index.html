@@ -386,7 +386,10 @@ onAuthStateChanged(auth, async (user) => {
 });
 </script>
 </body><!-- زر لفتح اللوحة المنبثقة -->
-<button id="openLinks" class="vp-btn">🌐 روابطنا</button>
+<div class="card vp-card" onclick="document.getElementById('linksPopup').style.display='block'">
+  <h3>🌐 روابطنا</h3>
+  <p>انضم لمجتمعنا</p>
+</div>
 
 <!-- اللوحة المنبثقة -->
 <div id="linksPopup" class="vp-popup">
@@ -488,4 +491,20 @@ setInterval(() => {
   visible = !visible;
   moonBtn.style.opacity = visible ? 1 : 0;
 }, 3000);
-</script>
+</script><div class="card vp-card" onclick="location.href='wheel.html'">
+  <h3>🎡 عجلة الحظ</h3>
+  <p>اضغط للدخول</p>
+</div>
+
+<style>
+.vp-card{
+  cursor:pointer;
+  text-align:center;
+  transition:0.3s;
+}
+
+.vp-card:hover{
+  transform:scale(1.04);
+  box-shadow:0 0 20px rgba(0,255,180,0.3);
+}
+</style>
