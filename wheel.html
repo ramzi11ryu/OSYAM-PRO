@@ -211,7 +211,26 @@ font-size:13px;
 </div>
 </div>
 
-<div id="balanceDisplay">الرصيد: 0 دج</div>
+<div id="balanceDisplay">الرصيد: 0 دج</div><button onclick="openOverlay()" style="
+position:fixed;
+bottom:90px;
+right:20px;
+width:55px;
+height:55px;
+border-radius:50%;
+border:none;
+background:rgba(255,140,0,0.25);
+backdrop-filter: blur(6px);
+color:orange;
+font-size:24px;
+cursor:pointer;
+box-shadow:0 0 15px rgba(255,140,0,0.4);
+transition:0.3s;
+">
+
+🎁
+
+</button>
 
 <div class="container">
 <div id="arrow"></div>
@@ -230,7 +249,7 @@ font-size:13px;
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
-import { getFirestore, doc, getDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
+import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
 import { getAuth, onAuthStateChanged, signInAnonymously } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
 
 const firebaseConfig={
@@ -252,14 +271,13 @@ const ctx=canvas.getContext("2d");
 const spinBtn=document.getElementById("spinBtn");
 const overlay=document.getElementById("overlay");
 const errorBox=document.getElementById("error");
-const sound=document.getElementById("successSound");
 
 let canSpin=false;
 let usedSpin=false;
 let userBalance=0;
 let currentUser=null;
 
-let prizes=[100,200,10,300,50,10,20,70,30,10,0,150,60,40,500,250,0,10];
+let prizes=[1000,200,10,3000,50,10,2000,70,30,10,0,150,60,40,5000,250,0,10];
 
 const slice=2*Math.PI/prizes.length;
 const center=150;
@@ -268,14 +286,12 @@ const radius=140;
 let angle=0;
 let spinning=false;
 
-/* تشغيل الموسيقى */
-document.addEventListener("DOMContentLoaded",()=>{
-document.getElementById("bgMusic").play().catch(()=>{});
-});
-
 /* تسجيل الدخول */
 onAuthStateChanged(auth,async user=>{
-if(!user){signInAnonymously(auth);return;}
+if(!user){
+signInAnonymously(auth);
+return;
+}
 
 currentUser=user;
 
@@ -295,7 +311,6 @@ document.getElementById("balanceDisplay").textContent=
 
 /* رسم العجلة */
 function drawWheel(){
-
 ctx.clearRect(0,0,300,300);
 
 for(let i=0;i<prizes.length;i++){
@@ -400,8 +415,6 @@ return;
 
 errorBox.style.display="none";
 
-sound.play();
-
 canSpin=true;
 usedSpin=false;
 
@@ -416,24 +429,10 @@ overlay.style.display="none";
 drawWheel();
 requestAnimationFrame(loop);
 })();
+</script>
 
-</script><script>
+<script>
 function openOverlay(){
-  document.getElementById("overlay").style.display="flex";
+document.getElementById("overlay").style.display="flex";
 }
 </script>
-</body>
-</html><button onclick="openOverlay()" style="
-padding:10px 18px;
-border:none;
-border-radius:12px;
-background:linear-gradient(45deg,#00ffcc,#10b981);
-color:white;
-font-weight:bold;
-font-size:14px;
-cursor:pointer;
-box-shadow:0 0 10px rgba(0,255,200,0.5);
-transition:0.3s;
-">
-🎁 إدخال الرمز
-</button>
