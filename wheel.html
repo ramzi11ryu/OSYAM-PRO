@@ -2,438 +2,69 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<title>عجلة الحظ - DZ GEMS</title>
+<title>انتظار تفعيل العجلة</title>
 
 <style>
-html, body{
+body{
 margin:0;
-padding:0;
-width:100%;
-height:100%;
-font-family:Arial, sans-serif;
+height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+background:black;
+font-family:Arial;
 color:#00ffcc;
-background:#000;
-display:flex;
-flex-direction:column;
-justify-content:center;
-align-items:center;
-}
-.video-bg{
-position:fixed;
-top:0;
-left:0;
-width:100%;
-height:100%;
-z-index:-1;
-}
-
-.video-bg iframe{
-position:absolute;
-top:50%;
-left:50%;
-width:177.77vh;
-height:100vw;
-min-width:177.77vw;
-min-height:100vh;
-transform:translate(-50%,-50%);
-pointer-events:none;
-}
-
-#balanceDisplay{
-font-size:18px;
-margin-bottom:15px;
-}
-
-.container{
-position:relative;
 text-align:center;
-}
-
-canvas{
-border-radius:50%;
-background:rgba(0,0,0,.3);
-}
-
-#arrow{
-position:absolute;
-top:0;
-left:50%;
-transform:translate(-50%,-50%);
-width:0;
-height:0;
-border-left:20px solid transparent;
-border-right:20px solid transparent;
-border-top:30px solid red;
-z-index:10;
-}
-
-#spinBtn{
-margin-top:15px;
-padding:10px 20px;
-border:none;
-border-radius:10px;
-background:#10b981;
-color:#fff;
-font-weight:bold;
-cursor:pointer;
-}
-
-#spinBtn:disabled{
-opacity:.4;
-cursor:not-allowed;
-}
-
-#overlay{
-position:fixed;
-inset:0;
-background:rgba(0,0,0,0.7);
-display:flex;
-justify-content:center;
-align-items:center;
-z-index:9999;
 }
 
 .box{
-background:#111;
-padding:25px;
+background:rgba(17,17,17,0.85);
+padding:30px;
 border-radius:15px;
-width:280px;
-text-align:center;
-box-shadow:0 0 20px cyan;
+box-shadow:0 0 25px cyan;
 }
 
-.box input{
-width:100%;
-padding:10px;
-border-radius:10px;
-border:none;
-margin-bottom:10px;
-text-align:center;
+h2{
+margin-bottom:15px;
 }
 
-.box button{
-width:100%;
-padding:10px;
-border:none;
-border-radius:10px;
-background:cyan;
-cursor:pointer;
-}
-
-#error{
-color:red;
-display:none;
+#timer{
+font-size:28px;
+color:#ffcc00;
+margin-top:15px;
 }
 </style>
 </head>
 
 <body>
 
-<div class="video-bg">
-<iframe src="https://www.youtube.com/embed/Ma34Kr-GoAs?autoplay=1&mute=1&loop=1&playlist=Ma34Kr-GoAs&controls=0&modestbranding=1"
-allowfullscreen></iframe>
+<div class="box">
+<h2>⏳ العجلة غير متاحة حالياً ❤️</h2>
+<p>الرجاء الانتظار حتى يتم فتح العجلة</p>
+
+<div id="timer">05:00</div>
 </div>
-
-<div id="overlay" style="
-display:none;
-position:fixed;
-inset:0;
-justify-content:center;
-align-items:center;
-z-index:9999;
-backdrop-filter: blur(6px);
-">
-
-<div style="
-position:relative;
-background:rgba(17,17,17,0.5);
-padding:18px;
-border-radius:16px;
-width:240px;
-text-align:center;
-box-shadow:0 0 12px rgba(0,255,200,0.5);
-">
-
-<button onclick="document.getElementById('overlay').style.display='none'"
-style="
-position:absolute;
-top:6px;
-right:6px;
-border:none;
-background:rgba(255,0,0,0.7);
-color:white;
-width:26px;
-height:26px;
-border-radius:50%;
-cursor:pointer;
-font-size:14px;
-">
-×
-</button>
-
-<div style="font-size:22px;margin-bottom:6px">🌙</div>
-
-<h3 style="margin:6px 0;color:#00ffcc;font-size:16px">
-أدخل رمز العجلة
-</h3>
-
-<input id="codeInput" placeholder="اكتب الرمز"
-style="
-width:100%;
-padding:7px;
-border-radius:8px;
-border:none;
-text-align:center;
-outline:none;
-font-size:13px;
-background:rgba(255,255,255,0.05);
-color:white;
-">
-
-<button onclick="checkCode()"
-style="
-width:100%;
-padding:8px;
-margin-top:8px;
-border:none;
-border-radius:8px;
-background:linear-gradient(45deg,#00ffcc,#10b981);
-font-weight:bold;
-cursor:pointer;
-font-size:13px;
-">
-تأكيد
-</button>
-
-<div id="error" style="color:#ff4444;display:none;margin-top:6px;font-size:12px">
-❌ الرمز غير صحيح
-</div>
-
-</div>
-</div>
-
-<div id="balanceDisplay">الرصيد: 0 دج</div><button onclick="openOverlay()" style="
-position:fixed;
-bottom:90px;
-right:20px;
-width:55px;
-height:55px;
-border-radius:50%;
-border:none;
-background:rgba(255,140,0,0.25);
-backdrop-filter: blur(6px);
-color:orange;
-font-size:24px;
-cursor:pointer;
-box-shadow:0 0 15px rgba(255,140,0,0.4);
-transition:0.3s;
-">
-
-🎁
-
-</button>
-
-<div class="container">
-<div id="arrow"></div>
-<canvas id="wheel" width="300" height="300"></canvas>
-<button id="spinBtn" disabled>دور العجلة 🎡</button>
-</div>
-
-<audio id="bgMusic" loop>
-<source src="https://files.catbox.moe/io9dvo.mp3">
-</audio>
-
-<audio id="successSound">
-<source src="https://n.uguu.se/jiqCfjSD.mp3">
-</audio>
-
-<script type="module">
-
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
-import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
-import { getAuth, onAuthStateChanged, signInAnonymously } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
-
-const firebaseConfig={
-apiKey:"AIzaSyBiQ4dHe4sbKDIrsyF8WdpjV3sY4qAxU4E",
-authDomain:"osim-d1821.firebaseapp.com",
-projectId:"osim-d1821",
-storageBucket:"osim-d1821.firebasestorage.app",
-messagingSenderId:"464951343183",
-appId:"1:464951343183:web:21c7615a90e4f38385923a"
-};
-
-const app=initializeApp(firebaseConfig);
-const db=getFirestore(app);
-const auth=getAuth(app);
-
-const canvas=document.getElementById("wheel");
-const ctx=canvas.getContext("2d");
-
-const spinBtn=document.getElementById("spinBtn");
-const overlay=document.getElementById("overlay");
-const errorBox=document.getElementById("error");
-
-let canSpin=false;
-let usedSpin=false;
-let userBalance=0;
-let currentUser=null;
-
-let prizes=[1000,200,10,3000,50,10,2000,70,30,10,0,150,60,40,5000,250,0,10];
-
-const slice=2*Math.PI/prizes.length;
-const center=150;
-const radius=140;
-
-let angle=0;
-let spinning=false;
-
-/* تسجيل الدخول */
-onAuthStateChanged(auth,async user=>{
-if(!user){
-signInAnonymously(auth);
-return;
-}
-
-currentUser=user;
-
-const ref=doc(db,"users",user.uid);
-const snap=await getDoc(ref);
-
-if(!snap.exists()){
-await setDoc(ref,{balance:0});
-userBalance=0;
-}else{
-userBalance=snap.data().balance||0;
-}
-
-document.getElementById("balanceDisplay").textContent=
-"الرصيد: "+userBalance+" دج";
-});
-
-/* رسم العجلة */
-function drawWheel(){
-ctx.clearRect(0,0,300,300);
-
-for(let i=0;i<prizes.length;i++){
-
-let start=angle+i*slice-Math.PI/2;
-
-ctx.beginPath();
-ctx.moveTo(center,center);
-ctx.arc(center,center,center,start,start+slice);
-
-ctx.fillStyle=i%2?"rgba(37,99,235,.6)":"rgba(0,0,0,.3)";
-ctx.fill();
-
-ctx.save();
-ctx.translate(center,center);
-ctx.rotate(start+slice/2);
-
-ctx.fillStyle="#fff";
-ctx.font="bold 14px Arial";
-ctx.textAlign="right";
-ctx.fillText(prizes[i]+" دج",center-20,5);
-
-ctx.restore();
-}
-
-/* نقاط مضيئة */
-for(let i=0;i<500;i++){
-
-let a=i*2*Math.PI/100+angle;
-
-let x=center+Math.cos(a)*radius;
-let y=center+Math.sin(a)*radius;
-
-ctx.beginPath();
-ctx.arc(x,y,4,0,2*Math.PI);
-
-ctx.fillStyle=`hsl(${Date.now()/100%360},100%,60%)`;
-
-ctx.shadowBlur=15;
-ctx.shadowColor=`hsl(${Date.now()/10%360},100%,60%)`;
-
-ctx.fill();
-ctx.shadowBlur=0;
-}
-}
-
-/* الدوران */
-spinBtn.onclick=function(){
-
-if(spinning||!canSpin||usedSpin) return;
-
-spinning=true;
-
-let velocity=0.4+Math.random()*0.2;
-let friction=0.985;
-
-function spinStep(){
-
-if(!spinning) return;
-
-angle+=velocity;
-drawWheel();
-
-velocity*=friction;
-
-if(velocity<0.005){
-
-spinning=false;
-usedSpin=true;
-
-spinBtn.disabled=true;
-spinBtn.style.opacity=".4";
-
-let normalized=(2*Math.PI-(angle%(2*Math.PI)))%(2*Math.PI);
-let index=Math.floor(normalized/slice);
-
-let win=prizes[index];
-
-alert("🎉 ربحت "+win+" دج");
-
-return;
-}
-
-requestAnimationFrame(spinStep);
-}
-
-requestAnimationFrame(spinStep);
-};
-
-/* التحقق من الرمز */
-window.checkCode=async function(){
-
-let val=document.getElementById("codeInput").value.trim();
-if(!val) return;
-
-let snap=await getDoc(doc(db,"wheelCodes",val));
-
-if(!snap.exists()){
-errorBox.style.display="block";
-return;
-}
-
-errorBox.style.display="none";
-
-canSpin=true;
-usedSpin=false;
-
-spinBtn.disabled=false;
-spinBtn.style.opacity="1";
-
-overlay.style.display="none";
-};
-
-/* التحديث */
-(function loop(){
-drawWheel();
-requestAnimationFrame(loop);
-})();
-</script>
 
 <script>
-function openOverlay(){
-document.getElementById("overlay").style.display="flex";
+let time = 300; // 5 دقائق
+
+function startTimer(){
+let timerBox = document.getElementById("timer");
+
+setInterval(()=>{
+let m = Math.floor(time/60);
+let s = time%60;
+
+timerBox.textContent =
+String(m).padStart(2,'0')+":"+String(s).padStart(2,'0');
+
+if(time>0) time--;
+
+},1000);
 }
+
+startTimer();
 </script>
+
+</body>
+</html>
