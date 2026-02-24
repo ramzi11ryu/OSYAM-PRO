@@ -2,8 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<title>انتظار تفعيل العجلة</title>
-
+<title>إعلان</title>
 <style>
 body{
 margin:0;
@@ -11,27 +10,22 @@ height:100vh;
 display:flex;
 justify-content:center;
 align-items:center;
-background:black;
+background:#000;
 font-family:Arial;
 color:#00ffcc;
 text-align:center;
 }
 
 .box{
-background:rgba(17,17,17,0.85);
-padding:30px;
-border-radius:15px;
+padding:40px;
+border-radius:20px;
+background:rgba(0,0,0,0.6);
 box-shadow:0 0 25px cyan;
 }
 
-h2{
-margin-bottom:15px;
-}
-
-#timer{
+h1{
 font-size:28px;
-color:#ffcc00;
-margin-top:15px;
+margin-bottom:15px;
 }
 </style>
 </head>
@@ -39,32 +33,9 @@ margin-top:15px;
 <body>
 
 <div class="box">
-<h2>⏳ العجلة غير متاحة حالياً ❤️</h2>
-<p>الرجاء الانتظار حتى يتم فتح العجلة</p>
-
-<div id="timer">05:00</div>
+<h1>❤️ قريباً حضور العجلة الكبيرة 🎡</h1>
+<p>انتظروا تحديثات جديدة… العجلة ستعود بحجم أكبر ومفاجآت أكثر ✨</p>
 </div>
-
-<script>
-let time = 300; // 5 دقائق
-
-function startTimer(){
-let timerBox = document.getElementById("timer");
-
-setInterval(()=>{
-let m = Math.floor(time/60);
-let s = time%60;
-
-timerBox.textContent =
-String(m).padStart(2,'0')+":"+String(s).padStart(2,'0');
-
-if(time>0) time--;
-
-},1000);
-}
-
-startTimer();
-</script>
 
 </body>
 </html>
