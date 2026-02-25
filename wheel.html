@@ -1,121 +1,187 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<title>Real TV Rotate</title>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Osyam VP - الاستثمار</title>
 <style>
 body{
-margin:0;
-overflow:hidden;
-background:black;
+  margin:0;
+  font-family:'Segoe UI',sans-serif;
+  background:linear-gradient(135deg,#0b0c10,#1a1a1a);
+  color:#fff;
+}
+.container{
+  max-width:700px;
+  margin:20px auto;
+  padding:10px;
+}
+h2{
+  text-align:center;
+  color:#00ff00;
+  margin-bottom:10px;
+  text-shadow:0 0 8px #00ff00;
+}
+.level-box{
+  text-align:center;
+  margin-bottom:25px;
+  font-size:18px;
+  color:#ffd700;
+}
+.card{
+  background:rgba(255,255,255,0.05);
+  backdrop-filter:blur(15px);
+  border-radius:20px;
+  padding:20px;
+  margin-bottom:15px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  box-shadow:0 5px 15px rgba(0,0,0,0.6);
+  transition:0.3s;
+}
+.card:hover{
+  transform:scale(1.02);
+  box-shadow:0 10px 25px rgba(0,0,0,0.8);
+}
+.card.locked{
+  opacity:0.5;
+}
+.card h3{
+  margin:0;
+  font-size:20px;
+  color:#ffd700;
+  text-shadow:0 0 5px #ffd700;
+}
+.card p{
+  margin:4px 0;
+  font-size:16px;
+}
+button{
+  padding:10px 18px;
+  border:none;
+  border-radius:12px;
+  background:linear-gradient(135deg,#1a1a1a,#333);
+  color:#00ff00;
+  font-weight:bold;
+  cursor:pointer;
+  transition:0.3s;
+}
+button:hover:not(:disabled){
+  background:linear-gradient(135deg,#333,#555);
+  transform:scale(1.05);
+}
+button:disabled{
+  opacity:0.5;
+  cursor:not-allowed;
 }
 </style>
-
 </head>
-
 <body>
 
-<script>
+<div class="container">
+  <h2>💹 باقات الاستثمار VP</h2>
+  <div class="level-box" id="levelBox">⭐ المستوى: VIP 0</div>
+  <div id="plans"></div>
+</div>
 
-/* Scene */
-const scene=new THREE.Scene();
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+import { getFirestore, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
 
-/* Camera */
-const camera=new THREE.PerspectiveCamera(
-60,
-window.innerWidth/window.innerHeight,
-0.1,
-1000
-);
+const firebaseConfig = {
+  apiKey: "AIzaSyBiQ4dHe4sbKDIrsyF8WdpjV3sY4qAxU4E",
+  authDomain: "osim-d1821.firebaseapp.com",
+  projectId: "osim-d1821",
+  storageBucket: "osim-d1821.firebasestorage.app",
+  messagingSenderId: "464951343183",
+  appId: "1:464951343183:web:21c7615a90e4f38385923a"
+};
 
-camera.position.set(0,2,12);
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
 
-/* Renderer */
-const renderer=new THREE.WebGLRenderer({antialias:true});
-renderer.setSize(window.innerWidth,window.innerHeight);
-document.body.appendChild(renderer.domElement);
+const plansContainer = document.getElementById("plans");
+const levelBox = document.getElementById("levelBox");
 
-/* Lighting */
-scene.add(new THREE.AmbientLight(0xffffff,0.8));
+const plans = [
+  {id:"A1",name:"VP A1",amount:4000,profit:150,open:true,level:1},
+  {id:"D2",name:"VP D2",amount:15800,profit:500,open:true,level:2},
+  {id:"M3",name:"VP M3",amount:50000,profit:2000,open:true,level:3},
+  {id:"B4",name:"VP B4",amount:90000,profit:4000,open:false,level:4},
+  {id:"C5",name:"VP C5",amount:170000,profit:9000,open:false,level:5},
+  {id:"N6",name:"VP N6",amount:230000,profit:13000,open:false,level:6},
+  {id:"Y7",name:"VP Y7",amount:450000,profit:20000,open:false,level:7},
+  {id:"G8",name:"VP G8",amount:900000,profit:50000,open:false,level:8},
+  {id:"F9",name:"VP F9",amount:11000000,profit:100000,open:false,level:9}
+];
 
-const light=new THREE.PointLight(0xffd700,1.5);
-light.position.set(10,8,10);
-scene.add(light);
+onAuthStateChanged(auth, async(user)=>{
+  if(!user){
+    alert("❌ الرجاء تسجيل الدخول أولاً");
+    window.location.href="login.html";
+    return;
+  }
 
-/* Realistic TV Shape */
+  const userRef = doc(db,"users",user.uid);
+  const userSnap = await getDoc(userRef);
+  if(!userSnap.exists()){
+    alert("❌ بيانات المستخدم غير موجودة");
+    window.location.href="login.html";
+    return;
+  }
 
-const tvGeo=new THREE.BoxGeometry(6,3.5,0.7);
+  let userData = userSnap.data();
+  levelBox.textContent = `⭐ المستوى: VIP ${userData.level || 0}`;
 
-const tvMat=new THREE.MeshStandardMaterial({
-color:0x333333,
-metalness:0.7,
-roughness:0.3
+  for(const plan of plans){
+    try{
+      const docRef = doc(db,"plans",plan.id);
+      const snap = await getDoc(docRef);
+      if(snap.exists()){
+        plan.open = snap.data().open;
+      }
+    }catch(e){
+      console.log("خطأ في Firebase",plan.id,e);
+    }
+
+    const card = document.createElement("div");
+    card.className="card";
+    if(!plan.open) card.classList.add("locked");
+
+    card.innerHTML = `
+      <div>
+        <h3>${plan.name}</h3>
+        <p>💰 المبلغ: ${plan.amount} دج</p>
+        <p>📈 الأرباح: ${plan.profit} دج</p>
+        <p>⏳ مدة الاستثمار: سنة كاملة</p>
+      </div>
+      <button ${!plan.open?"disabled":""}>استثمار</button>
+    `;
+
+    const btn = card.querySelector("button");
+    btn.onclick = async()=>{
+      userData = (await getDoc(userRef)).data();
+
+      if(userData.balance >= plan.amount){
+        // خصم المبلغ + تحديث المستوى
+        await updateDoc(userRef,{
+          balance: userData.balance - plan.amount,
+          level: plan.level
+        });
+        levelBox.textContent = `⭐ المستوى: VIP ${plan.level}`;
+        alert("🎊 تم الاستثمار بنجاح!");
+      }else{
+        alert("❌ رصيد غير كافي!");
+        setTimeout(() => { window.location.href = "deposit.html"; }, 100);
+      }
+    };
+
+    plansContainer.appendChild(card);
+  }
 });
-
-const tv=new THREE.Mesh(tvGeo,tvMat);
-scene.add(tv);
-
-/* Screen */
-
-const canvas=document.createElement("canvas");
-canvas.width=512;
-canvas.height=512;
-
-const ctx=canvas.getContext("2d");
-
-function drawScreen(){
-
-ctx.fillStyle="black";
-ctx.fillRect(0,0,512,512);
-
-ctx.fillStyle="#00ffcc";
-ctx.font="bold 120px Arial";
-ctx.textAlign="center";
-
-ctx.fillText("OSYAM PRO",256,300);
-
-}
-
-const texture=new THREE.CanvasTexture(canvas);
-
-/* Screen inside TV */
-
-const screenGeo=new THREE.PlaneGeometry(5.5,3.1);
-
-const screenMat=new THREE.MeshBasicMaterial({
-map:texture
-});
-
-const screen=new THREE.Mesh(screenGeo,screenMat);
-screen.position.z=0.36;
-
-tv.add(screen);
-
-/* Rotation TV */
-
-function animate(){
-
-requestAnimationFrame(animate);
-
-tv.rotation.y+=0.002;
-
-renderer.render(scene,camera);
-}
-
-drawScreen();
-animate();
-
-/* Resize */
-
-window.addEventListener("resize",()=>{
-camera.aspect=window.innerWidth/window.innerHeight;
-camera.updateProjectionMatrix();
-renderer.setSize(window.innerWidth,window.innerHeight);
-});
-
 </script>
 
 </body>
