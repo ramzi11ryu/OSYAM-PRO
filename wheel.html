@@ -1,349 +1,120 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar">
 <head>
 <meta charset="UTF-8">
-<title>عجلة الحظ - DZ GEMS</title>
+<title>Real TV Rotate</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
 <style>
-html, body{
+body{
 margin:0;
-padding:0;
-width:100%;
-height:100%;
-font-family:Arial, sans-serif;
-color:#00ffcc;
-background:#000;
-display:flex;
-flex-direction:column;
-justify-content:center;
-align-items:center;
-}
-
-.video-bg{
-position:fixed;
-top:0;
-left:0;
-width:100%;
-height:100%;
-z-index:-1;
-}
-
-.video-bg iframe{
-position:absolute;
-top:50%;
-left:50%;
-width:177.77vh;
-height:100vw;
-min-width:177.77vw;
-min-height:100vh;
-transform:translate(-50%,-50%);
-pointer-events:none;
-}
-
-#balanceDisplay{
-font-size:18px;
-margin-bottom:15px;
-}
-
-.container{
-position:relative;
-text-align:center;
-}
-
-canvas{
-border-radius:50%;
-background:rgba(0,0,0,.3);
-width:85vw;
-height:85vw;
-max-width:450px;
-max-height:450px;
-}
-
-#arrow{
-position:absolute;
-top:0;
-left:50%;
-transform:translate(-50%,-50%);
-width:0;
-height:0;
-border-left:20px solid transparent;
-border-right:20px solid transparent;
-border-top:30px solid red;
-z-index:10;
-}
-
-#spinBtn{
-margin-top:15px;
-padding:10px 20px;
-border:none;
-border-radius:10px;
-background:#10b981;
-color:#fff;
-font-weight:bold;
-cursor:pointer;
-}
-
-#spinBtn:disabled{
-opacity:.4;
-cursor:not-allowed;
-}
-
-#overlay{
-position:fixed;
-inset:0;
-background:rgba(0,0,0,0.7);
-display:flex;
-justify-content:center;
-align-items:center;
-z-index:9999;
+overflow:hidden;
+background:black;
 }
 </style>
+
 </head>
 
 <body>
 
-<div class="video-bg">
-<iframe src="https://www.youtube.com/embed/Ma34Kr-GoAs?autoplay=1&mute=1&loop=1&playlist=Ma34Kr-GoAs&controls=0&modestbranding=1"></iframe>
-</div>
+<script>
 
-<div id="overlay" style="display:none;">
-<div style="
-position:relative;
-background:rgba(17,17,17,0.5);
-padding:18px;
-border-radius:16px;
-width:240px;
-text-align:center;
-box-shadow:0 0 12px rgba(0,255,200,0.5);
-">
+/* Scene */
+const scene=new THREE.Scene();
 
-<button onclick="document.getElementById('overlay').style.display='none'"
-style="
-position:absolute;
-top:6px;
-right:6px;
-border:none;
-background:rgba(255,0,0,0.7);
-color:white;
-width:26px;
-height:26px;
-border-radius:50%;
-cursor:pointer;
-">
-×
-</button>
+/* Camera */
+const camera=new THREE.PerspectiveCamera(
+60,
+window.innerWidth/window.innerHeight,
+0.1,
+1000
+);
 
-<h3 style="color:#00ffcc;font-size:16px">أدخل رمز العجلة</h3>
+camera.position.set(0,2,12);
 
-<input id="codeInput" placeholder="اكتب الرمز"
-style="
-width:100%;
-padding:7px;
-border-radius:8px;
-border:none;
-text-align:center;
-outline:none;
-font-size:13px;
-background:rgba(255,255,255,0.05);
-color:white;
-">
+/* Renderer */
+const renderer=new THREE.WebGLRenderer({antialias:true});
+renderer.setSize(window.innerWidth,window.innerHeight);
+document.body.appendChild(renderer.domElement);
 
-<button onclick="checkCode()"
-style="
-width:100%;
-padding:8px;
-margin-top:8px;
-border:none;
-border-radius:8px;
-background:linear-gradient(45deg,#00ffcc,#10b981);
-font-weight:bold;
-cursor:pointer;
-font-size:13px;
-">
-تأكيد
-</button>
+/* Lighting */
+scene.add(new THREE.AmbientLight(0xffffff,0.8));
 
-<div id="error" style="color:red;display:none;margin-top:6px;font-size:12px">
-❌ الرمز غير صحيح
-</div>
+const light=new THREE.PointLight(0xffd700,1.5);
+light.position.set(10,8,10);
+scene.add(light);
 
-</div>
-</div>
+/* Realistic TV Shape */
 
-<div id="balanceDisplay">الرصيد: 0 دج</div>
+const tvGeo=new THREE.BoxGeometry(6,3.5,0.7);
 
-<button onclick="openOverlay()"
-style="
-position:fixed;
-bottom:90px;
-right:20px;
-width:55px;
-height:55px;
-border-radius:50%;
-border:none;
-background:rgba(255,140,0,0.25);
-backdrop-filter: blur(6px);
-color:orange;
-font-size:24px;
-cursor:pointer;
-box-shadow:0 0 15px rgba(255,140,0,0.4);
-">
-🎁
-</button>
+const tvMat=new THREE.MeshStandardMaterial({
+color:0x333333,
+metalness:0.7,
+roughness:0.3
+});
 
-<div class="container">
-<div id="arrow"></div>
-<canvas id="wheel"></canvas>
-<button id="spinBtn" disabled>دور العجلة 🎡</button>
-</div>
+const tv=new THREE.Mesh(tvGeo,tvMat);
+scene.add(tv);
 
-<script type="module">
+/* Screen */
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
-import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
-import { getAuth, onAuthStateChanged, signInAnonymously } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
+const canvas=document.createElement("canvas");
+canvas.width=512;
+canvas.height=512;
 
-const firebaseConfig={
-apiKey:"YOUR_KEY",
-authDomain:"YOUR_DOMAIN",
-projectId:"YOUR_PROJECT"
-};
-
-const app=initializeApp(firebaseConfig);
-const db=getFirestore(app);
-const auth=getAuth(app);
-
-const canvas=document.getElementById("wheel");
 const ctx=canvas.getContext("2d");
 
-const spinBtn=document.getElementById("spinBtn");
-const overlay=document.getElementById("overlay");
-const errorBox=document.getElementById("error");
+function drawScreen(){
 
-let canSpin=false;
-let usedSpin=false;
+ctx.fillStyle="black";
+ctx.fillRect(0,0,512,512);
 
-let prizes=[1000,200,10,3000,50,10,2000,70,30,10,0,150,60,40,5000,250,0,10];
+ctx.fillStyle="#00ffcc";
+ctx.font="bold 120px Arial";
+ctx.textAlign="center";
 
-const slice=2*Math.PI/prizes.length;
+ctx.fillText("OSYAM PRO",256,300);
 
-let center;
-let radius;
-let angle=0;
-let spinning=false;
-
-function resizeCanvas(){
-let size=Math.min(window.innerWidth*0.85,450);
-
-canvas.width=size;
-canvas.height=size;
-
-center=size/2;
-radius=center-10;
 }
 
-resizeCanvas();
-window.addEventListener("resize",resizeCanvas);
+const texture=new THREE.CanvasTexture(canvas);
 
-/* رسم العجلة */
-function drawWheel(){
-ctx.clearRect(0,0,canvas.width,canvas.height);
+/* Screen inside TV */
 
-for(let i=0;i<prizes.length;i++){
+const screenGeo=new THREE.PlaneGeometry(5.5,3.1);
 
-let start=angle+i*slice-Math.PI/2;
+const screenMat=new THREE.MeshBasicMaterial({
+map:texture
+});
 
-ctx.beginPath();
-ctx.moveTo(center,center);
-ctx.arc(center,center,center,start,start+slice);
+const screen=new THREE.Mesh(screenGeo,screenMat);
+screen.position.z=0.36;
 
-ctx.fillStyle=i%2?"rgba(37,99,235,.6)":"rgba(0,0,0,.3)";
-ctx.fill();
+tv.add(screen);
 
-ctx.save();
-ctx.translate(center,center);
-ctx.rotate(start+slice/2);
+/* Rotation TV */
 
-ctx.fillStyle="#fff";
-ctx.font="bold 14px Arial";
-ctx.textAlign="right";
-ctx.fillText(prizes[i]+" دج",center-20,5);
+function animate(){
 
-ctx.restore();
-}
+requestAnimationFrame(animate);
+
+tv.rotation.y+=0.002;
+
+renderer.render(scene,camera);
 }
 
-/* الدوران */
-spinBtn.onclick=function(){
+drawScreen();
+animate();
 
-if(spinning||!canSpin||usedSpin) return;
+/* Resize */
 
-spinning=true;
-
-let velocity=0.4+Math.random()*0.2;
-let friction=0.985;
-
-function spinStep(){
-
-angle+=velocity;
-drawWheel();
-
-velocity*=friction;
-
-if(velocity<0.005){
-
-spinning=false;
-usedSpin=true;
-
-spinBtn.disabled=true;
-
-let normalized=(2*Math.PI-(angle%(2*Math.PI)))%(2*Math.PI);
-let index=Math.floor(normalized/slice);
-
-let win=prizes[index];
-
-alert("🎉 ربحت "+win+" دج");
-return;
-}
-
-requestAnimationFrame(spinStep);
-}
-
-requestAnimationFrame(spinStep);
-};
-
-/* التحقق من الرمز */
-window.checkCode=async function(){
-
-let val=document.getElementById("codeInput").value.trim();
-if(!val) return;
-
-let snap=await getDoc(doc(db,"wheelCodes",val));
-
-if(!snap.exists()){
-errorBox.style.display="block";
-return;
-}
-
-errorBox.style.display="none";
-
-canSpin=true;
-usedSpin=false;
-
-spinBtn.disabled=false;
-
-overlay.style.display="none";
-};
-
-/* التحديث */
-(function loop(){
-drawWheel();
-requestAnimationFrame(loop);
-})();
-
-function openOverlay(){
-document.getElementById("overlay").style.display="flex";
-}
+window.addEventListener("resize",()=>{
+camera.aspect=window.innerWidth/window.innerHeight;
+camera.updateProjectionMatrix();
+renderer.setSize(window.innerWidth,window.innerHeight);
+});
 
 </script>
 
