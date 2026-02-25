@@ -356,26 +356,7 @@ ctx.fillText(prizes[i]+" دج",center-20,5);
 ctx.restore();
 }
 
-/* نقاط مضيئة */
-for(let i=0;i<500;i++){
-
-let a=i*2*Math.PI/100+angle;
-
-let x=center+Math.cos(a)*radius;
-let y=center+Math.sin(a)*radius;
-
-ctx.beginPath();
-ctx.arc(x,y,4,0,2*Math.PI);
-
-ctx.fillStyle=`hsl(${Date.now()/100%360},100%,60%)`;
-
-ctx.shadowBlur=15;
-ctx.shadowColor=`hsl(${Date.now()/10%360},100%,60%)`;
-
-ctx.fill();
-ctx.shadowBlur=0;
-}
-}
+                                     }
 
 /* الدوران */
 spinBtn.onclick=function(){
