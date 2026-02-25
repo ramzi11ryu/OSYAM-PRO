@@ -51,12 +51,12 @@ text-align:center;
 }
 
 canvas{
+border-radius:50%;
+background:rgba(0,0,0,.3);
 width:85vw;
 height:85vw;
 max-width:450px;
 max-height:450px;
-border-radius:50%;
-background:rgba(0,0,0,.3);
 }
 
 #arrow{
@@ -87,17 +87,109 @@ cursor:pointer;
 opacity:.4;
 cursor:not-allowed;
 }
+
+#overlay{
+position:fixed;
+inset:0;
+background:rgba(0,0,0,0.7);
+display:flex;
+justify-content:center;
+align-items:center;
+z-index:9999;
+}
 </style>
 </head>
 
 <body>
 
 <div class="video-bg">
-<iframe src="https://www.youtube.com/embed/Ma34Kr-GoAs?autoplay=1&mute=1&loop=1&playlist=Ma34Kr-GoAs&controls=0"
-allowfullscreen></iframe>
+<iframe src="https://www.youtube.com/embed/Ma34Kr-GoAs?autoplay=1&mute=1&loop=1&playlist=Ma34Kr-GoAs&controls=0&modestbranding=1"></iframe>
+</div>
+
+<div id="overlay" style="display:none;">
+<div style="
+position:relative;
+background:rgba(17,17,17,0.5);
+padding:18px;
+border-radius:16px;
+width:240px;
+text-align:center;
+box-shadow:0 0 12px rgba(0,255,200,0.5);
+">
+
+<button onclick="document.getElementById('overlay').style.display='none'"
+style="
+position:absolute;
+top:6px;
+right:6px;
+border:none;
+background:rgba(255,0,0,0.7);
+color:white;
+width:26px;
+height:26px;
+border-radius:50%;
+cursor:pointer;
+">
+×
+</button>
+
+<h3 style="color:#00ffcc;font-size:16px">أدخل رمز العجلة</h3>
+
+<input id="codeInput" placeholder="اكتب الرمز"
+style="
+width:100%;
+padding:7px;
+border-radius:8px;
+border:none;
+text-align:center;
+outline:none;
+font-size:13px;
+background:rgba(255,255,255,0.05);
+color:white;
+">
+
+<button onclick="checkCode()"
+style="
+width:100%;
+padding:8px;
+margin-top:8px;
+border:none;
+border-radius:8px;
+background:linear-gradient(45deg,#00ffcc,#10b981);
+font-weight:bold;
+cursor:pointer;
+font-size:13px;
+">
+تأكيد
+</button>
+
+<div id="error" style="color:red;display:none;margin-top:6px;font-size:12px">
+❌ الرمز غير صحيح
+</div>
+
+</div>
 </div>
 
 <div id="balanceDisplay">الرصيد: 0 دج</div>
+
+<button onclick="openOverlay()"
+style="
+position:fixed;
+bottom:90px;
+right:20px;
+width:55px;
+height:55px;
+border-radius:50%;
+border:none;
+background:rgba(255,140,0,0.25);
+backdrop-filter: blur(6px);
+color:orange;
+font-size:24px;
+cursor:pointer;
+box-shadow:0 0 15px rgba(255,140,0,0.4);
+">
+🎁
+</button>
 
 <div class="container">
 <div id="arrow"></div>
@@ -114,7 +206,7 @@ import { getAuth, onAuthStateChanged, signInAnonymously } from "https://www.gsta
 const firebaseConfig={
 apiKey:"YOUR_KEY",
 authDomain:"YOUR_DOMAIN",
-projectId:"YOUR_PROJECT",
+projectId:"YOUR_PROJECT"
 };
 
 const app=initializeApp(firebaseConfig);
@@ -124,27 +216,36 @@ const auth=getAuth(app);
 const canvas=document.getElementById("wheel");
 const ctx=canvas.getContext("2d");
 
-let center;
-let radius;
-
-function resizeCanvas(){
-let size = Math.min(window.innerWidth*0.85,450);
-canvas.width=size;
-canvas.height=size;
-center=size/2;
-radius=center-10;
-}
-resizeCanvas();
-window.addEventListener("resize",resizeCanvas);
-
 const spinBtn=document.getElementById("spinBtn");
+const overlay=document.getElementById("overlay");
+const errorBox=document.getElementById("error");
+
+let canSpin=false;
+let usedSpin=false;
 
 let prizes=[1000,200,10,3000,50,10,2000,70,30,10,0,150,60,40,5000,250,0,10];
+
 const slice=2*Math.PI/prizes.length;
 
+let center;
+let radius;
 let angle=0;
 let spinning=false;
 
+function resizeCanvas(){
+let size=Math.min(window.innerWidth*0.85,450);
+
+canvas.width=size;
+canvas.height=size;
+
+center=size/2;
+radius=center-10;
+}
+
+resizeCanvas();
+window.addEventListener("resize",resizeCanvas);
+
+/* رسم العجلة */
 function drawWheel(){
 ctx.clearRect(0,0,canvas.width,canvas.height);
 
@@ -172,8 +273,10 @@ ctx.restore();
 }
 }
 
+/* الدوران */
 spinBtn.onclick=function(){
-if(spinning) return;
+
+if(spinning||!canSpin||usedSpin) return;
 
 spinning=true;
 
@@ -188,8 +291,18 @@ drawWheel();
 velocity*=friction;
 
 if(velocity<0.005){
+
 spinning=false;
-alert("🎉 انتهى الدوران");
+usedSpin=true;
+
+spinBtn.disabled=true;
+
+let normalized=(2*Math.PI-(angle%(2*Math.PI)))%(2*Math.PI);
+let index=Math.floor(normalized/slice);
+
+let win=prizes[index];
+
+alert("🎉 ربحت "+win+" دج");
 return;
 }
 
@@ -199,17 +312,39 @@ requestAnimationFrame(spinStep);
 requestAnimationFrame(spinStep);
 };
 
+/* التحقق من الرمز */
+window.checkCode=async function(){
+
+let val=document.getElementById("codeInput").value.trim();
+if(!val) return;
+
+let snap=await getDoc(doc(db,"wheelCodes",val));
+
+if(!snap.exists()){
+errorBox.style.display="block";
+return;
+}
+
+errorBox.style.display="none";
+
+canSpin=true;
+usedSpin=false;
+
+spinBtn.disabled=false;
+
+overlay.style.display="none";
+};
+
+/* التحديث */
 (function loop(){
 drawWheel();
 requestAnimationFrame(loop);
 })();
 
-</script>
-
-<script>
 function openOverlay(){
 document.getElementById("overlay").style.display="flex";
 }
+
 </script>
 
 </body>
